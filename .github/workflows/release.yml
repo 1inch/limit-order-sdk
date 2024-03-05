@@ -10,8 +10,9 @@ on:
           - patch
           - minor
           - major
+          - prerelease
 jobs:
-  release:
+  publish-to-github:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -48,13 +49,13 @@ jobs:
         id: version
         run: |
           echo "OLD_VERSION=$(pnpm pkg get version | tr -d '"')" >> "$GITHUB_OUTPUT"
-          pnpm version ${{ github.event.inputs.version }} --git-tag-version=false
+          pnpm version ${{ github.event.inputs.version }} --preid rc --git-tag-version=false
           echo "NEW_VERSION=$(pnpm pkg get version | tr -d '"')" >> "$GITHUB_OUTPUT"
 
       - name: Generate changelog
         run: pnpm changelog:generate -t v${{ steps.version.outputs.OLD_VERSION }} || pnpm changelog:generate
 
-      - name: Install dependencies
+      - name: Build
         run: pnpm build
 
       - name: Copy files to dist for successfull publish
@@ -80,3 +81,39 @@ jobs:
           git push
           git push --tags
           gh release create v${{ steps.version.outputs.NEW_VERSION }} --notes-file CHANGELOG.md
+
+  publish-to-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+          scope: ${{ github.repository_owner }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Bump package.json version
+        id: version
+        run: |
+          echo "OLD_VERSION=$(pnpm pkg get version | tr -d '"')" >> "$GITHUB_OUTPUT"
+          pnpm version ${{ github.event.inputs.version }} --git-tag-version=false
+          echo "NEW_VERSION=$(pnpm pkg get version | tr -d '"')" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Publish
+        run: pnpm publish
+        working-directory: dist
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
