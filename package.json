@@ -1,9 +1,22 @@
 {
   "name": "@1inch/limit-order-sdk",
   "version": "4.1.0",
-  "description": "Lib desc",
+  "description": "SDK for 1inch Limit Order Protocol",
   "author": "@1inch",
   "license": "MIT",
+  "private": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:1inch/limit-order-sdk.git"
+  },
   "scripts": {
     "build": "tsc",
     "docs:generate": "tsdoc --src=src/limit-order/* --dest=src/limit-order/README.md",
