@@ -1,6 +1,6 @@
 import {isAddress} from 'ethers'
+import {add0x} from '@1inch/byte-utils'
 import assert from 'assert'
-import {add0x} from './utils/bytes/zero-x-prefix'
 
 export class Address {
     static NATIVE_CURRENCY = new Address(

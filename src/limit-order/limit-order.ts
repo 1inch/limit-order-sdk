@@ -1,4 +1,5 @@
 import {AbiCoder} from 'ethers'
+import {isHexString, UINT_160_MAX} from '@1inch/byte-utils'
 import assert from 'assert'
 import {
     buildOrderTypedData,
@@ -9,9 +10,7 @@ import {
 import {LimitOrderV4Struct, OrderInfoData} from './types'
 import {MakerTraits} from './maker-traits'
 import {Extension} from './extension'
-import {isHexString} from '../validations'
 import {Address} from '../address'
-import {UINT_160_MAX} from '../constants'
 
 export class LimitOrder {
     private static readonly Web3Type = `tuple(${[

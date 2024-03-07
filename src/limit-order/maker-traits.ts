@@ -1,8 +1,6 @@
+import {add0x, BitMask, BN} from '@1inch/byte-utils'
 import assert from 'assert'
-import {BN} from '../utils/bytes/bn'
 import {Address} from '../address'
-import {BitMask} from '../utils/bytes/bit-mask'
-import {add0x} from '../utils/bytes/zero-x-prefix'
 
 /**
  * The MakerTraits type is an uint256, and different parts of the number are used to encode different traits.

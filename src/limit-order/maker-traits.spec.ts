@@ -1,6 +1,6 @@
+import {UINT_160_MAX, UINT_40_MAX} from '@1inch/byte-utils'
 import {MakerTraits} from './maker-traits'
 import {Address} from '../address'
-import {UINT_160_MAX, UINT_40_MAX} from '../constants'
 
 describe('MakerTraits', () => {
     test('allowed sender', () => {

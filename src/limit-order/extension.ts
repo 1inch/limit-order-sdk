@@ -1,8 +1,7 @@
 import {keccak256} from 'ethers'
+import {isHexString, trim0x} from '@1inch/byte-utils'
 import assert from 'assert'
-import {isHexString} from '../validations'
 import {ZX} from '../constants'
-import {trim0x} from '../utils/bytes/zero-x-prefix'
 
 export class Extension {
     public readonly makerAssetSuffix: string = ZX
