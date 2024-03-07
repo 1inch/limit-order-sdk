@@ -37,7 +37,7 @@ describe('MakerTraits', () => {
         const traits = MakerTraits.default()
         const series = 100n
         const epoch = 1n
-        traits.withEpoch(series, epoch)
+        traits.allowPartialFills().allowMultipleFills().withEpoch(series, epoch)
         expect(traits.series()).toEqual(series)
         expect(traits.nonceOrEpoch()).toEqual(epoch)
         expect(traits.isEpochManagerEnabled()).toEqual(true)
@@ -120,18 +120,18 @@ describe('MakerTraits', () => {
     test('all', () => {
         const traits = MakerTraits.default()
             .withAllowedSender(Address.fromBigInt(UINT_160_MAX))
+            .allowPartialFills()
+            .allowMultipleFills()
             .withEpoch(UINT_40_MAX, UINT_40_MAX)
             .withExpiration(UINT_40_MAX)
             .withExtension()
-            .allowMultipleFills()
-            .disablePartialFills() // disabling is setting bit to 1
             .enablePermit2()
             .enableNativeUnwrap()
             .enablePreInteraction()
             .enablePostInteraction()
 
         expect(traits.asBigInt().toString(16)).toEqual(
-            'df800000000000ffffffffffffffffffffffffffffffffffffffffffffffffff'
+            '5f800000000000ffffffffffffffffffffffffffffffffffffffffffffffffff'
         )
     })
 })

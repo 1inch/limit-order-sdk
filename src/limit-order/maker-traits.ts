@@ -385,10 +385,6 @@ export class MakerTraits {
      * @see MakerTraits.enableEpochManagerCheck
      */
     private setSeries(series: bigint): void {
-        assert(
-            this.isEpochManagerEnabled(),
-            'Series can be set only when epoch manager is enabled'
-        )
         this.value = this.value.setMask(MakerTraits.SERIES_MASK, series)
     }
 }
