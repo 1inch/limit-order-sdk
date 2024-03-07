@@ -13,17 +13,13 @@ describe('MakerTraits', () => {
         expect(senderHalf).toEqual(sender.toString().slice(-20))
     })
 
-    test('nonce/epoch', () => {
+    test('nonce', () => {
         const traits = MakerTraits.default()
 
         const nonce = 1n << 10n
 
         traits.withNonce(nonce)
         expect(traits.nonceOrEpoch()).toEqual(nonce)
-
-        const epoch = 2n << 20n
-        traits.withEpoch(epoch)
-        expect(traits.nonceOrEpoch()).toEqual(epoch)
 
         const big_nonce = 1n << 50n
         expect(() => traits.withNonce(big_nonce)).toThrow('to big for mask')
@@ -37,11 +33,14 @@ describe('MakerTraits', () => {
         expect(traits.expiration()).toEqual(expiration)
     })
 
-    test('series', () => {
+    test('epoch', () => {
         const traits = MakerTraits.default()
         const series = 100n
-        traits.withSeries(series)
+        const epoch = 1n
+        traits.withEpoch(series, epoch)
         expect(traits.series()).toEqual(series)
+        expect(traits.nonceOrEpoch()).toEqual(epoch)
+        expect(traits.isEpochManagerEnabled()).toEqual(true)
     })
 
     test('extension', () => {
@@ -96,17 +95,6 @@ describe('MakerTraits', () => {
         expect(traits.hasPostInteraction()).toEqual(false)
     })
 
-    test('epoch manager', () => {
-        const traits = MakerTraits.default()
-        expect(traits.isEpochManagerEnabled()).toEqual(false)
-
-        traits.enableEpochManagerCheck()
-        expect(traits.isEpochManagerEnabled()).toEqual(true)
-
-        traits.disableEpochManagerCheck()
-        expect(traits.isEpochManagerEnabled()).toEqual(false)
-    })
-
     test('permit2', () => {
         const traits = MakerTraits.default()
         expect(traits.isPermit2()).toEqual(false)
@@ -132,8 +120,7 @@ describe('MakerTraits', () => {
     test('all', () => {
         const traits = MakerTraits.default()
             .withAllowedSender(Address.fromBigInt(UINT_160_MAX))
-            .withNonce(UINT_40_MAX)
-            .withSeries(UINT_40_MAX)
+            .withEpoch(UINT_40_MAX, UINT_40_MAX)
             .withExpiration(UINT_40_MAX)
             .withExtension()
             .allowMultipleFills()
@@ -142,7 +129,6 @@ describe('MakerTraits', () => {
             .enableNativeUnwrap()
             .enablePreInteraction()
             .enablePostInteraction()
-            .enableEpochManagerCheck()
 
         expect(traits.asBigInt().toString(16)).toEqual(
             'df800000000000ffffffffffffffffffffffffffffffffffffffffffffffffff'

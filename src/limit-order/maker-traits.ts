@@ -124,34 +124,21 @@ export class MakerTraits {
     }
 
     /**
-     * Set epoch. Only when epoch manager enabled
+     * Enable epoch manager check
+     *
+     * If set, the contract will check that order epoch equals to epoch on `SeriesEpochManager` contract
+     * Note: epoch manager can be used only when `partialFills` AND `multipleFills` allowed
      * Note: nonce and epoch share the same field, so they cant be set together
      *
-     * @see enableEpochManagerCheck
+     * @param series subgroup for epoch
+     * @param epoch unique order id inside series
+     * @see https://github.com/1inch/limit-order-protocol/blob/23d655844191dea7960a186652307604a1ed480a/contracts/helpers/SeriesEpochManager.sol#L6
      */
-    public withEpoch(epoch: bigint): this {
-        assert(
-            this.isEpochManagerEnabled(),
-            'Epoch can be set only when epoch manager is enabled'
-        )
+    public withEpoch(series: bigint, epoch: bigint): this {
+        this.setSeries(series)
+        this.enableEpochManagerCheck()
 
         return this.withNonce(epoch)
-    }
-
-    /**
-     * Set series. Only when epoch manager enabled
-     * Series is a subgroup for epoch's, it can be useful when you want to cancel a group of orders at once
-     *
-     * @see MakerTraits.enableEpochManagerCheck
-     */
-    public withSeries(series: bigint): this {
-        assert(
-            this.isEpochManagerEnabled(),
-            'Series can be set only when epoch manager is enabled'
-        )
-        this.value = this.value.setMask(MakerTraits.SERIES_MASK, series)
-
-        return this
     }
 
     /**
@@ -309,42 +296,6 @@ export class MakerTraits {
     }
 
     /**
-     * Enable epoch manager check. If set, the contract will check that order epoch equals to epoch on `SeriesEpochManager` contract
-     * Note: epoch manager can be used only when `partialFills` AND `multipleFills` allowed
-     *
-     * @see MakerTraits.withSeries
-     * @see MakerTraits.withEpoch
-     * @see https://github.com/1inch/limit-order-protocol/blob/23d655844191dea7960a186652307604a1ed480a/contracts/helpers/SeriesEpochManager.sol#L6
-     */
-    public enableEpochManagerCheck(): this {
-        assert(
-            !this.isBitInvalidatorMode(),
-            'Epoch manager allowed only when partialFills and multipleFills enabled'
-        )
-
-        this.value = this.value.setBit(
-            MakerTraits.NEED_CHECK_EPOCH_MANAGER_FLAG,
-            1
-        )
-
-        return this
-    }
-
-    /**
-     * Disable epoch manager
-     *
-     * @see MakerTraits.enableEpochManagerCheck
-     */
-    public disableEpochManagerCheck(): this {
-        this.value = this.value.setBit(
-            MakerTraits.NEED_CHECK_EPOCH_MANAGER_FLAG,
-            0
-        )
-
-        return this
-    }
-
-    /**
      * Returns true if `permit2` enabled for maker funds transfer
      *
      * @see https://github.com/Uniswap/permit2
@@ -413,5 +364,31 @@ export class MakerTraits {
      */
     public isBitInvalidatorMode(): boolean {
         return !this.isPartialFillAllowed() || !this.isMultipleFillsAllowed()
+    }
+
+    private enableEpochManagerCheck(): void {
+        assert(
+            !this.isBitInvalidatorMode(),
+            'Epoch manager allowed only when partialFills and multipleFills enabled'
+        )
+
+        this.value = this.value.setBit(
+            MakerTraits.NEED_CHECK_EPOCH_MANAGER_FLAG,
+            1
+        )
+    }
+
+    /**
+     * Set series. Only when epoch manager enabled
+     * Series is a subgroup for epoch's, it can be useful when you want to cancel a group of orders at once
+     *
+     * @see MakerTraits.enableEpochManagerCheck
+     */
+    private setSeries(series: bigint): void {
+        assert(
+            this.isEpochManagerEnabled(),
+            'Series can be set only when epoch manager is enabled'
+        )
+        this.value = this.value.setMask(MakerTraits.SERIES_MASK, series)
     }
 }
