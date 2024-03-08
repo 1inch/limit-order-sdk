@@ -24,7 +24,7 @@ export class RfqOrder extends LimitOrder {
 
         const makerTraits = new MakerTraits(0n)
             .disableMultipleFills()
-            .disablePartialFills()
+            .allowPartialFills()
             .withExpiration(expiration)
             .withNonce(nonce)
 
