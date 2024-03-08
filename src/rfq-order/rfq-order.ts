@@ -3,7 +3,7 @@ import {Address} from '../address'
 
 /**
  * Light, gas efficient version of LimitOrder
- * It does not support multiple/partial fills and extension
+ * It does not support multiple fills and extension
  */
 export class RfqOrder extends LimitOrder {
     constructor(
