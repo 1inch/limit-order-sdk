@@ -1,4 +1,4 @@
-name: Publish new version
+name: Release new version
 
 on:
   workflow_dispatch:
@@ -10,12 +10,14 @@ on:
           - patch
           - minor
           - major
+          - prerelease
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
+      actions: write
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
@@ -36,37 +38,18 @@ jobs:
           node-version: 18
           cache: pnpm
 
-      - name: Auth in GitHub private registry npm
-        run: |
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
-          echo "@1inch:registry=https://npm.pkg.github.com" >> .npmrc
-
-      - name: Install Dependencies
-        run: pnpm install
+      - name: Install Dev Dependencies
+        run: pnpm install -D
 
       - name: Bump package.json version
         id: version
         run: |
           echo "OLD_VERSION=$(pnpm pkg get version | tr -d '"')" >> "$GITHUB_OUTPUT"
-          pnpm version ${{ github.event.inputs.version }} --git-tag-version=false
+          pnpm version ${{ github.event.inputs.version }} --preid rc --git-tag-version=false
           echo "NEW_VERSION=$(pnpm pkg get version | tr -d '"')" >> "$GITHUB_OUTPUT"
 
       - name: Generate changelog
         run: pnpm changelog:generate -t v${{ steps.version.outputs.OLD_VERSION }} || pnpm changelog:generate
-
-      - name: Install dependencies
-        run: pnpm build
-
-      - name: Copy files to dist for successfull publish
-        run: |
-          cp package.json dist/package.json
-          cp .npmrc dist/.npmrc
-
-      - name: Publish
-        run: pnpm publish --no-git-checks
-        working-directory: dist
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create github release
         env:
@@ -80,3 +63,8 @@ jobs:
           git push
           git push --tags
           gh release create v${{ steps.version.outputs.NEW_VERSION }} --notes-file CHANGELOG.md
+
+      - name: Trigger publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run publish.yml -r v${{ steps.version.outputs.NEW_VERSION }}
