@@ -33,7 +33,9 @@ const order = new LimitOrder({
     takerAsset: new Address('0x111111111117dc0aa78b770fa6a738034120c302'),
     makingAmount: 100_000000n, // 100 USDT
     takingAmount: 10_00000000000000000n, // 10 1INCH
-    maker: new Address(maker.address)
+    maker: new Address(maker.address),
+    // salt? : bigint
+    // receiver? : Address
 })
 
 const typedData = order.getTypedData()
