@@ -70,14 +70,10 @@ const order = new RfqOrder({
     makingAmount: parseUnits('100'),
     takingAmount: parseUnits('10'),
     maker: new Address(maker.address)
-    // salt? : bigint
-    // receiver? : Address
 }, {
     allowedSender: new Address('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'),
     expiration,
     nonce: randBigInt(10000),
-    unwrapToNative: false,
-    usePermit2: false
 })
 
 const typedData = order.getTypedData()
