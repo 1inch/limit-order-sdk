@@ -49,7 +49,7 @@ const signature = await maker.signTypedData(
 
 ### RFQ Order creation
 
-`RfqOrder` is a light, gas efficient version of LimitOrder, but it does not support multiple fills and extensions
+`RfqOrder` is a light, gas efficient version of LimitOrder, but it does not support multiple fills and extension
 Mainly used by market makers
 
 ```typescript
