@@ -64,7 +64,7 @@ Hex string with 0x
 
 #### :gear: encode
 
-Hex string with 0x. First 20 bytes is target, then data
+Hex string with 0x. First 20 bytes are target, then data
 
 | Method | Type |
 | ---------- | ---------- |
@@ -182,12 +182,12 @@ uint40 series
 - [default](#gear-default)
 - [allowedSender](#gear-allowedsender)
 - [withAllowedSender](#gear-withallowedsender)
+- [withAnySender](#gear-withanysender)
 - [expiration](#gear-expiration)
 - [withExpiration](#gear-withexpiration)
 - [nonceOrEpoch](#gear-nonceorepoch)
 - [withNonce](#gear-withnonce)
 - [withEpoch](#gear-withepoch)
-- [withSeries](#gear-withseries)
 - [series](#gear-series)
 - [hasExtension](#gear-hasextension)
 - [withExtension](#gear-withextension)
@@ -206,8 +206,6 @@ uint40 series
 - [enablePostInteraction](#gear-enablepostinteraction)
 - [disablePostInteraction](#gear-disablepostinteraction)
 - [isEpochManagerEnabled](#gear-isepochmanagerenabled)
-- [enableEpochManagerCheck](#gear-enableepochmanagercheck)
-- [disableEpochManagerCheck](#gear-disableepochmanagercheck)
 - [isPermit2](#gear-ispermit2)
 - [enablePermit2](#gear-enablepermit2)
 - [disablePermit2](#gear-disablepermit2)
@@ -236,6 +234,14 @@ Last 10bytes of address
 | Method | Type |
 | ---------- | ---------- |
 | `withAllowedSender` | `(sender: Address) => this` |
+
+#### :gear: withAnySender
+
+Removes `sender` check on contract
+
+| Method | Type |
+| ---------- | ---------- |
+| `withAnySender` | `() => this` |
 
 #### :gear: expiration
 
@@ -277,21 +283,21 @@ Note: nonce and epoch share the same field, so they cant be set together
 
 #### :gear: withEpoch
 
-Set epoch. Only when epoch manager enabled
+Enable epoch manager check
+
+If set, the contract will check that order epoch equals to epoch on `SeriesEpochManager` contract
+Note: epoch manager can be used only when `partialFills` AND `multipleFills` allowed
 Note: nonce and epoch share the same field, so they cant be set together
 
 | Method | Type |
 | ---------- | ---------- |
-| `withEpoch` | `(epoch: bigint) => this` |
+| `withEpoch` | `(series: bigint, epoch: bigint) => this` |
 
-#### :gear: withSeries
+Parameters:
 
-Set series. Only when epoch manager enabled
-Series is a subgroup for epoch's, it can be useful when you want to cancel a group of orders at once
+* `series`: subgroup for epoch
+* `epoch`: unique order id inside series
 
-| Method | Type |
-| ---------- | ---------- |
-| `withSeries` | `(series: bigint) => this` |
 
 #### :gear: series
 
@@ -436,23 +442,6 @@ Returns true if epoch manager enabled
 | Method | Type |
 | ---------- | ---------- |
 | `isEpochManagerEnabled` | `() => boolean` |
-
-#### :gear: enableEpochManagerCheck
-
-Enable epoch manager check. If set, the contract will check that order epoch equals to epoch on `SeriesEpochManager` contract
-Note: epoch manager can be used only when `partialFills` AND `multipleFills` allowed
-
-| Method | Type |
-| ---------- | ---------- |
-| `enableEpochManagerCheck` | `() => this` |
-
-#### :gear: disableEpochManagerCheck
-
-Disable epoch manager
-
-| Method | Type |
-| ---------- | ---------- |
-| `disableEpochManagerCheck` | `() => this` |
 
 #### :gear: isPermit2
 

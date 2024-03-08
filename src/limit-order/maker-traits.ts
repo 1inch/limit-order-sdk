@@ -68,10 +68,24 @@ export class MakerTraits {
     }
 
     public withAllowedSender(sender: Address): this {
+        assert(!sender.isZero(), 'Use withAnySender() to remove sender check')
+
         const lastHalf = add0x(sender.toString().slice(-20))
         this.value = this.value.setMask(
             MakerTraits.ALLOWED_SENDER_MASK,
             BigInt(lastHalf)
+        )
+
+        return this
+    }
+
+    /**
+     * Removes `sender` check on contract
+     */
+    public withAnySender(): this {
+        this.value = this.value.setMask(
+            MakerTraits.ALLOWED_SENDER_MASK,
+            BigInt(0)
         )
 
         return this
