@@ -52,7 +52,7 @@ export function getDomainSeparator(
     )
 }
 
-export function getLimitOrderV3Domain(chainId: number): EIP712DomainType {
+export function getLimitOrderV4Domain(chainId: number): EIP712DomainType {
     return {
         name: LimitOrderV4TypeDataName,
         version: LimitOrderV4TypeDataVersion,

@@ -3,7 +3,7 @@ import {isHexString, UINT_160_MAX} from '@1inch/byte-utils'
 import assert from 'assert'
 import {
     buildOrderTypedData,
-    getLimitOrderV3Domain,
+    getLimitOrderV4Domain,
     getOrderHash,
     EIP712TypedData
 } from './eip712'
@@ -126,7 +126,7 @@ export class LimitOrder {
         }
     }
 
-    getTypedData(domain = getLimitOrderV3Domain(1)): EIP712TypedData {
+    getTypedData(domain = getLimitOrderV4Domain(1)): EIP712TypedData {
         return buildOrderTypedData(
             domain.chainId,
             domain.verifyingContract,
@@ -136,7 +136,7 @@ export class LimitOrder {
         )
     }
 
-    getOrderHash(domain = getLimitOrderV3Domain(1)): string {
+    getOrderHash(domain = getLimitOrderV4Domain(1)): string {
         return getOrderHash(this.getTypedData(domain))
     }
 }
