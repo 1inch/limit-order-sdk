@@ -78,7 +78,6 @@ const order = new RfqOrder({
     nonce: randBigInt(10000),
     unwrapToNative: false,
     usePermit2: false
-
 })
 
 const typedData = order.getTypedData()
