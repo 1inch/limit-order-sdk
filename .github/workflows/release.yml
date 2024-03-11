@@ -36,14 +36,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          registry-url: 'https://npm.pkg.github.com'
-          scope: ${{ github.repository_owner }}
           cache: pnpm
 
       - name: Install Dev Dependencies
         run: pnpm install -D
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump package.json version
         id: version

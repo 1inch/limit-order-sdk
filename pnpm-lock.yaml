@@ -92,12 +92,12 @@ devDependencies:
 packages:
 
   /@1inch/byte-utils@1.0.1:
-    resolution: {integrity: sha512-f8w5upJ+rv04GLTCm9xn7huFTuQLU6docxkkRBF7T5FS3DRzvK+U/qdVNt+icsmWzqIVk+h01p4GgipEdUC81w==, tarball: https://npm.pkg.github.com/download/@1inch/byte-utils/1.0.1/31b9eb9abb72923bf1a4aa60f63b98e2678b4ff5}
+    resolution: {integrity: sha512-f8w5upJ+rv04GLTCm9xn7huFTuQLU6docxkkRBF7T5FS3DRzvK+U/qdVNt+icsmWzqIVk+h01p4GgipEdUC81w==}
     engines: {node: '>=18.16.0'}
     dev: false
 
   /@1inch/eslint-config@1.4.3(@typescript-eslint/eslint-plugin@5.59.11)(@typescript-eslint/parser@5.51.0)(eslint-config-prettier@8.3.0)(eslint-config-standard@17.1.0)(eslint-import-resolver-typescript@3.5.5)(eslint-plugin-import@2.26.0)(eslint-plugin-n@16.6.2)(eslint-plugin-prettier@4.2.1)(eslint-plugin-promise@6.1.1)(eslint-plugin-unused-imports@2.0.0)(eslint@8.41.0)(prettier@2.8.8)(typescript@4.9.4):
-    resolution: {integrity: sha512-a+pjtXiFDwMedttrHIeP1C92T/CRamJa7MNJUn6JXRrTtMnJmE6ijkqnL+Pt3eYfAtb4IyNHdN7n5gaW/cZi8Q==, tarball: https://npm.pkg.github.com/download/@1inch/eslint-config/1.4.3/d4661a1f5ed346ddfbae6eeb01e838af7eec9f80}
+    resolution: {integrity: sha512-I2fMNrQqoqhKCh6T+PVaXVeFEsOTawuYxBHXXa0+upgpzFkT1/IkoNkAnEJ19s+ne+9qlXIcD0ZCkptux1f9og==}
     peerDependencies:
       '@typescript-eslint/eslint-plugin': ^5.59.0
       '@typescript-eslint/parser': ^5.51.0
@@ -130,7 +130,7 @@ packages:
     dev: true
 
   /@1inch/tsconfig@1.0.7:
-    resolution: {integrity: sha512-uPV9toGicSHysWJANdVZTzEOX+ePKLNQybWKMKOtVBJRpHZmLGq9il5FgUOyIFXlTHBDDQXjrAwgKBhZ5mlMuw==, tarball: https://npm.pkg.github.com/download/@1inch/tsconfig/1.0.7/948920928f70c706075b76ee401fe1ab628a4a59}
+    resolution: {integrity: sha512-uPV9toGicSHysWJANdVZTzEOX+ePKLNQybWKMKOtVBJRpHZmLGq9il5FgUOyIFXlTHBDDQXjrAwgKBhZ5mlMuw==}
     dependencies:
       semver: 7.6.0
     dev: true
