@@ -7,3 +7,7 @@ export function isValidAmount(value: string | bigint): boolean {
         return false
     }
 }
+
+export function isInt(val: number): boolean {
+    return Math.floor(val) === val
+}
