@@ -62,30 +62,14 @@ export class Api {
         },
         sort?: SortKey
     ): Promise<LimitOrderApiItem[]> {
-        const params = {} as Record<string, string>
-
-        if (filters) {
-            if (filters.pager) {
-                params.limit = filters.pager.limit.toString()
-                params.page = filters.pager.page.toString()
-            }
-
-            if (filters.statuses) {
-                params.statuses = filters.statuses.join(',')
-            }
-
-            if (filters.makerAsset) {
-                params.makerAsset = filters.makerAsset.toString()
-            }
-
-            if (filters.takerAsset) {
-                params.takerAsset = filters.takerAsset.toString()
-            }
-        }
-
-        if (sort) {
-            params.sortBy = sort
-        }
+        const params = {
+            limit: filters?.pager?.limit.toString(),
+            page: filters?.pager?.page.toString(),
+            statuses: filters?.statuses?.join(','),
+            makerAsset: filters?.makerAsset?.toString(),
+            takerAsset: filters?.takerAsset?.toString(),
+            sortBy: sort
+        } as Record<string, string>
 
         return this.httpClient.get(
             this.url(`/address/${maker}`, params),
