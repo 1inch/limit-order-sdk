@@ -1,5 +1,7 @@
 export * from './limit-order-contract'
 export * from './limit-order'
 export * from './rfq-order'
+export * from './address'
+export * from './constants'
 export * from './utils/rand-bigint'
 export * from './api'
