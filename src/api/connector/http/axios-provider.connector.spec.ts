@@ -5,7 +5,7 @@ describe('Axios Http provider connector', () => {
     let httpConnector: AxiosProviderConnector
 
     beforeEach(() => {
-        httpConnector = new AxiosProviderConnector('test-key')
+        httpConnector = new AxiosProviderConnector()
     })
 
     it('should make get() request', async () => {
