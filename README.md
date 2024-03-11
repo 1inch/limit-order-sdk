@@ -36,7 +36,7 @@ const order = new LimitOrder({
     maker: new Address(maker.address),
     // salt? : bigint
     // receiver? : Address
-})
+}, makerTraits)
 
 const typedData = order.getTypedData()
 const signature = await maker.signTypedData(
