@@ -1,9 +1,20 @@
 import {keccak256} from 'ethers'
-import {isHexString, trim0x} from '@1inch/byte-utils'
+import {BytesIter, isHexString, trim0x, UINT_32_MAX} from '@1inch/byte-utils'
 import assert from 'assert'
 import {ZX} from '../constants'
 
 export class Extension {
+    private static fields = [
+        'makerAssetSuffix',
+        'takerAssetSuffix',
+        'makingAmountData',
+        'takingAmountData',
+        'predicate',
+        'makerPermit',
+        'preInteraction',
+        'postInteraction'
+    ] as const
+
     public readonly makerAssetSuffix: string = ZX
 
     public readonly takerAssetSuffix: string = ZX
@@ -53,6 +64,30 @@ export class Extension {
         this.customData = data.customData
     }
 
+    static decode(bytes: string): Extension {
+        const iter = BytesIter.String(bytes)
+        let offsets = BigInt(iter.nextUint256())
+        let consumed = 0
+
+        const data = {} as Record<
+            (typeof Extension.fields)[number] | 'customData',
+            string
+        >
+
+        for (const field of Extension.fields) {
+            const offset = Number(offsets & UINT_32_MAX)
+            const bytesCount = offset - consumed
+            data[field] = iter.nextBytes(bytesCount)
+
+            consumed += bytesCount
+            offsets = offsets >> 32n
+        }
+
+        data.customData = iter.rest()
+
+        return new Extension(data)
+    }
+
     static default(): Extension {
         return new Extension()
     }
@@ -62,16 +97,7 @@ export class Extension {
     }
 
     public isEmpty(): boolean {
-        const allInteractions = [
-            this.makerAssetSuffix,
-            this.takerAssetSuffix,
-            this.makingAmountData,
-            this.takingAmountData,
-            this.predicate,
-            this.makerPermit,
-            this.preInteraction,
-            this.postInteraction
-        ]
+        const allInteractions = this.getAll()
         const allInteractionsConcat =
             allInteractions.map(trim0x).join('') + trim0x(this.customData)
 
@@ -82,16 +108,7 @@ export class Extension {
      * Hex string with 0x
      */
     public encode(): string {
-        const allInteractions = [
-            this.makerAssetSuffix,
-            this.takerAssetSuffix,
-            this.makingAmountData,
-            this.takingAmountData,
-            this.predicate,
-            this.makerPermit,
-            this.preInteraction,
-            this.postInteraction
-        ]
+        const allInteractions = this.getAll()
 
         const allInteractionsConcat =
             allInteractions.map(trim0x).join('') + trim0x(this.customData)
@@ -118,5 +135,9 @@ export class Extension {
         }
 
         return extension
+    }
+
+    private getAll(): string[] {
+        return Extension.fields.map((f) => this[f])
     }
 }
