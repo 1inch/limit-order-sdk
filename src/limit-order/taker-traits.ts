@@ -1,8 +1,7 @@
-import {BitMask, BN, trim0x} from '@1inch/byte-utils'
+import {BitMask, BN, getBytesCount, trim0x} from '@1inch/byte-utils'
 import {Extension} from './extension'
 import {Interaction} from './interaction'
 import {Address} from '../address'
-import {getBytesCount} from '../utils/bytes/get-bytes-count'
 
 export enum AmountMode {
     /**
