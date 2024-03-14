@@ -1,12 +1,12 @@
 import {Interface, Signature} from 'ethers'
-import {LimitOrder, TakerTraits} from '../limit-order'
+import {LimitOrderV4Struct, TakerTraits} from '../limit-order'
 import LOP_V4_ABI from '../abi/AggregationRouterV6.abi.json'
 
 const lopContract = new Interface(LOP_V4_ABI)
 
 export class LimitOrderContract {
     static getFillOrderArgsCalldata(
-        order: LimitOrder,
+        order: LimitOrderV4Struct,
         signature: string,
         takerTraits: TakerTraits,
         amount: bigint
@@ -15,7 +15,7 @@ export class LimitOrderContract {
         const {args, trait} = takerTraits.encode()
 
         return lopContract.encodeFunctionData('fillOrderArgs', [
-            order.build(),
+            order,
             r,
             vs,
             amount,
@@ -25,7 +25,7 @@ export class LimitOrderContract {
     }
 
     static getFillContractOrderArgsCalldata(
-        order: LimitOrder,
+        order: LimitOrderV4Struct,
         signature: string,
         takerTraits: TakerTraits,
         amount: bigint
@@ -33,7 +33,7 @@ export class LimitOrderContract {
         const {args, trait} = takerTraits.encode()
 
         return lopContract.encodeFunctionData('fillContractOrderArgs', [
-            order.build(),
+            order,
             signature,
             amount,
             trait,
