@@ -24,10 +24,17 @@ Calculates maker amount by linear proportion
 
 ### Methods
 
+- [decode](#gear-decode)
 - [default](#gear-default)
 - [keccak256](#gear-keccak256)
 - [isEmpty](#gear-isempty)
 - [encode](#gear-encode)
+
+#### :gear: decode
+
+| Method | Type |
+| ---------- | ---------- |
+| `decode` | `(bytes: string) => Extension` |
 
 #### :gear: default
 

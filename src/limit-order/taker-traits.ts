@@ -2,6 +2,7 @@ import {BitMask, BN, getBytesCount, trim0x} from '@1inch/byte-utils'
 import {Extension} from './extension'
 import {Interaction} from './interaction'
 import {Address} from '../address'
+import {ZX} from '../constants'
 
 export enum AmountMode {
     /**
@@ -251,7 +252,7 @@ export class TakerTraits {
             .setMask(TakerTraits.ARGS_INTERACTION_LENGTH_MASK, interactionLen)
 
         const args =
-            (this.receiver?.toString() || '0x') +
+            (this.receiver?.toString() || ZX) +
             trim0x(this.extension?.encode() || '') +
             trim0x(this.interaction?.encode() || '')
 

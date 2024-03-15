@@ -8,6 +8,7 @@ npm install '@1inch/limit-order-sdk'
 
 ## Docs
 - [Limit Order](./src/limit-order/README.md)
+- [Limit Order Contract](./src/limit-order-contract/README.md)
 
 ## Usage examples
 
