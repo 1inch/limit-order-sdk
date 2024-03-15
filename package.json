@@ -23,7 +23,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "docs:generate": "tsdoc --src=src/limit-order/* --dest=src/limit-order/README.md",
+    "docs:generate": "tsdoc --src=src/limit-order/* --dest=src/limit-order/README.md && tsdoc --src=src/limit-order-contract/* --dest=src/limit-order-contract/README.md",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:ci": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint": "eslint  \"{src,apps,libs,test}/**/*.ts\" --ignore-path .eslintignore --fix",
