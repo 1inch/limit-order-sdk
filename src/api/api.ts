@@ -87,7 +87,11 @@ export class Api {
     }
 
     private url(path: string, params?: Record<string, string>): string {
-        const query = params ? `?${new URLSearchParams(params)}` : ''
+        const query = params
+            ? `?${new URLSearchParams(
+                  Object.entries(params).filter(([_, val]) => val !== undefined)
+              )}`
+            : ''
 
         return `${this.baseUrl}/${this.networkId}${path}${query}`
     }

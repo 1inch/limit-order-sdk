@@ -13,7 +13,6 @@ npm install '@1inch/limit-order-sdk'
 ## Usage examples
 
 ### Order creation
-
 ```typescript
 import {LimitOrder, MakerTraits, Address} from "@1inch/limit-order-sdk"
 import {Wallet} from 'ethers'
@@ -89,13 +88,13 @@ const signature = await maker.signTypedData(
 ### API
 
 ```typescript
-import {Api, HttpProviderConnector, LimitOrder} from "@1inch/limit-order-sdk"
-import {AxiosProviderConnector} from "@1inch/limit-order-sdk/axios"
+import {Api, FetchProviderConnector, LimitOrder, getLimitOrderV4Domain, HttpProviderConnector} from '@1inch/limit-order-sdk'
 
+const networkId = 1 // ethereum
 const api = new Api({
-    networkId: 1, // ethereum
+    networkId,
     authKey: 'key', // get it at https://portal.1inch.dev/
-    httpConnector: new AxiosProviderConnector() // or use any connector which implements `HttpProviderConnector`
+    httpConnector: new FetchProviderConnector() // or use any connector which implements `HttpProviderConnector`
 })
 
 // submit order 
@@ -104,8 +103,24 @@ const signature = '0x'
 await api.submitOrder(order, signature)
 
 // get order by hash
-const orderInfo = await api.getOrderByHash(order.getOrderHash())
+const orderHash = order.getOrderHash(getLimitOrderV4Domain(networkId))
+const orderInfo = await api.getOrderByHash(orderHash)
 
 // get orders by maker
 const orders = await api.getOrdersByMaker(order.maker)
+```
+
+#### With `axios` as http provider
+
+`axios` package should be installed
+
+```typescript
+import {Api, LimitOrder} from "@1inch/limit-order-sdk"
+import {AxiosProviderConnector} from '@1inch/limit-order-sdk/axios'
+
+const api = new Api({
+    networkId: 1, // ethereum
+    authKey: 'key', // get it at https://portal.1inch.dev/
+    httpConnector: new AxiosProviderConnector()
+})
 ```
