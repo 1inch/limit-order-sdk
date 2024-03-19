@@ -136,7 +136,7 @@ export class LimitOrder {
         )
     }
 
-    getOrderHash(domain = getLimitOrderV4Domain(1)): string {
-        return getOrderHash(this.getTypedData(domain))
+    getOrderHash(chainId: number): string {
+        return getOrderHash(this.getTypedData(getLimitOrderV4Domain(chainId)))
     }
 }

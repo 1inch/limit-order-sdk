@@ -565,7 +565,7 @@ otherwise order won't be ever filled
 
 | Method | Type |
 | ---------- | ---------- |
-| `getOrderHash` | `(domain?: EIP712DomainType) => string` |
+| `getOrderHash` | `(chainId: number) => string` |
 
 
 ## :factory: TakerTraits

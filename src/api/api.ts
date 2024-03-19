@@ -33,7 +33,7 @@ export class Api {
         await this.httpClient.post(
             this.url('/'),
             {
-                orderHash: order.getOrderHash(),
+                orderHash: order.getOrderHash(this.networkId),
                 signature,
                 data: {
                     ...order.build(),
