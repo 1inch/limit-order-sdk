@@ -88,7 +88,7 @@ const signature = await maker.signTypedData(
 ### API
 
 ```typescript
-import {Api, FetchProviderConnector, LimitOrder, getLimitOrderV4Domain, HttpProviderConnector} from '@1inch/limit-order-sdk'
+import {Api, FetchProviderConnector, LimitOrder, HttpProviderConnector} from '@1inch/limit-order-sdk'
 
 const networkId = 1 // ethereum
 const api = new Api({
@@ -103,7 +103,7 @@ const signature = '0x'
 await api.submitOrder(order, signature)
 
 // get order by hash
-const orderHash = order.getOrderHash(getLimitOrderV4Domain(networkId))
+const orderHash = order.getOrderHash(networkId)
 const orderInfo = await api.getOrderByHash(orderHash)
 
 // get orders by maker
