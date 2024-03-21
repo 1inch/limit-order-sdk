@@ -142,7 +142,7 @@ export class LimitOrder {
         return getOrderHash(this.getTypedData(getLimitOrderV4Domain(chainId)))
     }
 
-    public isOrderPrivate(): boolean {
+    public isPrivate(): boolean {
         return this.makerTraits.allowedSender() !== ZeroAddressHalf
     }
 }
