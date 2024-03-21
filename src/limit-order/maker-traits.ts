@@ -67,6 +67,10 @@ export class MakerTraits {
             .padStart(20, '0')
     }
 
+    public isPrivate(): boolean {
+        return this.value.getMask(MakerTraits.ALLOWED_SENDER_MASK).value !== 0n
+    }
+
     public withAllowedSender(sender: Address): this {
         assert(!sender.isZero(), 'Use withAnySender() to remove sender check')
 
