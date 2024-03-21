@@ -12,6 +12,8 @@ import {MakerTraits} from './maker-traits'
 import {Extension} from './extension'
 import {Address} from '../address'
 
+const ZeroAddressHalf = '0'.repeat(20)
+
 export class LimitOrder {
     private static readonly Web3Type = `tuple(${[
         'uint256 salt',
@@ -126,7 +128,7 @@ export class LimitOrder {
         }
     }
 
-    getTypedData(domain = getLimitOrderV4Domain(1)): EIP712TypedData {
+    public getTypedData(domain = getLimitOrderV4Domain(1)): EIP712TypedData {
         return buildOrderTypedData(
             domain.chainId,
             domain.verifyingContract,
@@ -136,7 +138,11 @@ export class LimitOrder {
         )
     }
 
-    getOrderHash(chainId: number): string {
+    public getOrderHash(chainId: number): string {
         return getOrderHash(this.getTypedData(getLimitOrderV4Domain(chainId)))
+    }
+
+    public isOrderPrivate(): boolean {
+        return this.makerTraits.allowedSender() !== ZeroAddressHalf
     }
 }
