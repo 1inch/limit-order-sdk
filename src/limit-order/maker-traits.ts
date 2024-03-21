@@ -67,6 +67,10 @@ export class MakerTraits {
             .padStart(20, '0')
     }
 
+    public isPrivate(): boolean {
+        return this.allowedSender() !== ZeroAddressHalf
+    }
+
     public withAllowedSender(sender: Address): this {
         assert(!sender.isZero(), 'Use withAnySender() to remove sender check')
 
@@ -402,3 +406,5 @@ export class MakerTraits {
         this.value = this.value.setMask(MakerTraits.SERIES_MASK, series)
     }
 }
+
+const ZeroAddressHalf = '0'.repeat(20)
