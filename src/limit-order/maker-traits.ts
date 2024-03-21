@@ -68,7 +68,7 @@ export class MakerTraits {
     }
 
     public isPrivate(): boolean {
-        return this.allowedSender() !== ZeroAddressHalf
+        return this.value.getMask(MakerTraits.ALLOWED_SENDER_MASK).value !== 0n
     }
 
     public withAllowedSender(sender: Address): this {
@@ -406,5 +406,3 @@ export class MakerTraits {
         this.value = this.value.setMask(MakerTraits.SERIES_MASK, series)
     }
 }
-
-const ZeroAddressHalf = '0'.repeat(20)
