@@ -12,6 +12,8 @@ import {MakerTraits} from './maker-traits'
 import {Extension} from './extension'
 import {Address} from '../address'
 
+const ZeroAddressHalf = '0'.repeat(20)
+
 export class LimitOrder {
     private static readonly Web3Type = `tuple(${[
         'uint256 salt',
