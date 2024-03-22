@@ -188,6 +188,7 @@ uint40 series
 
 - [default](#gear-default)
 - [allowedSender](#gear-allowedsender)
+- [isPrivate](#gear-isprivate)
 - [withAllowedSender](#gear-withallowedsender)
 - [withAnySender](#gear-withanysender)
 - [expiration](#gear-expiration)
@@ -235,6 +236,12 @@ Last 10bytes of address
 | Method | Type |
 | ---------- | ---------- |
 | `allowedSender` | `() => string` |
+
+#### :gear: isPrivate
+
+| Method | Type |
+| ---------- | ---------- |
+| `isPrivate` | `() => boolean` |
 
 #### :gear: withAllowedSender
 
@@ -525,6 +532,7 @@ Bit invalidator is cheaper in terms of gas, but can be used only when partial fi
 - [build](#gear-build)
 - [getTypedData](#gear-gettypeddata)
 - [getOrderHash](#gear-getorderhash)
+- [isPrivate](#gear-isprivate)
 
 #### :gear: buildSalt
 
@@ -566,6 +574,14 @@ otherwise order won't be ever filled
 | Method | Type |
 | ---------- | ---------- |
 | `getOrderHash` | `(chainId: number) => string` |
+
+#### :gear: isPrivate
+
+Returns true if only a specific address can fill order
+
+| Method | Type |
+| ---------- | ---------- |
+| `isPrivate` | `() => boolean` |
 
 
 ## :factory: TakerTraits

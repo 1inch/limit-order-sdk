@@ -65,6 +65,10 @@ export class Extension {
     }
 
     static decode(bytes: string): Extension {
+        if (bytes === ZX) {
+            return Extension.default()
+        }
+
         const iter = BytesIter.String(bytes)
         let offsets = BigInt(iter.nextUint256())
         let consumed = 0
