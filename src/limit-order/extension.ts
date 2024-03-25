@@ -64,6 +64,14 @@ export class Extension {
         this.customData = data.customData
     }
 
+    get hasPredicate(): boolean {
+        return this.predicate !== ZX
+    }
+
+    get hasMakerPermit(): boolean {
+        return this.makerPermit !== ZX
+    }
+
     static decode(bytes: string): Extension {
         if (bytes === ZX) {
             return Extension.default()
