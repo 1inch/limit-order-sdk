@@ -126,7 +126,9 @@ export class LimitOrder {
         }
     }
 
-    public getTypedData(domain = getLimitOrderV4Domain(1)): EIP712TypedData {
+    public getTypedData(chainId: number): EIP712TypedData {
+        const domain = getLimitOrderV4Domain(chainId)
+
         return buildOrderTypedData(
             domain.chainId,
             domain.verifyingContract,
@@ -137,7 +139,7 @@ export class LimitOrder {
     }
 
     public getOrderHash(chainId: number): string {
-        return getOrderHash(this.getTypedData(getLimitOrderV4Domain(chainId)))
+        return getOrderHash(this.getTypedData(chainId))
     }
 
     /**
