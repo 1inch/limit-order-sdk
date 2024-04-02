@@ -1,5 +1,5 @@
 import {AbiCoder} from 'ethers'
-import {isHexString, UINT_160_MAX} from '@1inch/byte-utils'
+import {isHexString, UINT_160_MAX, UINT_256_MAX} from '@1inch/byte-utils'
 import assert from 'assert'
 import {
     buildOrderTypedData,
@@ -11,6 +11,7 @@ import {LimitOrderV4Struct, OrderInfoData} from './types'
 import {MakerTraits} from './maker-traits'
 import {Extension} from './extension'
 import {Address} from '../address'
+import {randBigInt} from '../utils/rand-bigint'
 
 export class LimitOrder {
     private static readonly Web3Type = `tuple(${[
@@ -54,6 +55,10 @@ export class LimitOrder {
         this.receiver = orderInfo.receiver || Address.ZERO_ADDRESS
         this.makerTraits = makerTraits
 
+        assert(this.salt <= UINT_256_MAX, 'salt too big')
+        assert(this.makingAmount <= UINT_256_MAX, 'makingAmount too big')
+        assert(this.takingAmount <= UINT_256_MAX, 'takingAmount too big')
+
         if (!extension.isEmpty()) {
             this.makerTraits.withExtension()
         }
@@ -70,7 +75,7 @@ export class LimitOrder {
      */
     static buildSalt(
         extension: Extension,
-        baseSalt = BigInt(Math.round(Math.random() * Date.now()))
+        baseSalt = randBigInt((2n << 96n) - 1n)
     ): bigint {
         if (extension.isEmpty()) {
             return baseSalt
