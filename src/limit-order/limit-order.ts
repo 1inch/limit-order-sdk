@@ -52,7 +52,9 @@ export class LimitOrder {
         this.takingAmount = orderInfo.takingAmount
         this.salt = orderInfo.salt || LimitOrder.buildSalt(extension)
         this.maker = orderInfo.maker
-        this.receiver = orderInfo.receiver || Address.ZERO_ADDRESS
+        this.receiver = orderInfo.receiver?.equal(orderInfo.maker)
+            ? Address.ZERO_ADDRESS
+            : orderInfo.receiver || Address.ZERO_ADDRESS
         this.makerTraits = makerTraits
 
         assert(this.salt <= UINT_256_MAX, 'salt too big')
