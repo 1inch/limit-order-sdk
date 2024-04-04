@@ -77,7 +77,7 @@ export class LimitOrder {
      */
     static buildSalt(
         extension: Extension,
-        baseSalt = randBigInt((2n << 96n) - 1n)
+        baseSalt = randBigInt((1n << 96n) - 1n)
     ): bigint {
         if (extension.isEmpty()) {
             return baseSalt
