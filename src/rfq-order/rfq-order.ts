@@ -16,6 +16,7 @@ export class RfqOrder extends LimitOrder {
             expiration: bigint
             /**
              * Unique id among all maker orders
+             * Max value is UINT_40_MAX
              */
             nonce: bigint
         }

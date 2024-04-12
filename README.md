@@ -54,6 +54,7 @@ Mainly used by market makers
 
 ```typescript
 import {RfqOrder, Address, randBigInt} from "@1inch/limit-order-sdk"
+import {UINT_40_MAX} from "@1inch/byte-utils"
 import {Wallet} from 'ethers'
 
 // it is a well-known test private key, do not use it in production
@@ -73,7 +74,7 @@ const order = new RfqOrder({
 }, {
     allowedSender: new Address('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'),
     expiration,
-    nonce: randBigInt(10000),
+    nonce: randBigInt(UINT_40_MAX),
 })
 
 const typedData = order.getTypedData()

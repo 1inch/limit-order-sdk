@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@1inch/byte-utils':
-    specifier: 2.0.0
-    version: 2.0.0
+    specifier: 2.2.1
+    version: 2.2.1
   '@metamask/eth-sig-util':
     specifier: ^5.0.2
     version: 5.1.0
@@ -91,8 +91,8 @@ devDependencies:
 
 packages:
 
-  /@1inch/byte-utils@2.0.0:
-    resolution: {integrity: sha512-CcEsI6At09oqWDFrZNUTokbiOVUG0HNkkAPIhHo6rMPG+1m4Zls+kSWtotFUpy7tp0PUby/PmrOkqZgk/hFq1A==}
+  /@1inch/byte-utils@2.2.1:
+    resolution: {integrity: sha512-ESIUUGcRu8cL+rFEJedSLOMMXUmLC3A0zyHcWH1fxLAzUsY+bdjqUX/jWQIbOqg+k1XKyXBu6vkREDna3JCp6w==}
     engines: {node: '>=18.16.0'}
     dev: false
 
