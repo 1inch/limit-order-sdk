@@ -33,7 +33,7 @@
     "changelog:generate": "changelog generate -a"
   },
   "dependencies": {
-    "@1inch/byte-utils": "2.0.0",
+    "@1inch/byte-utils": "2.2.1",
     "@metamask/eth-sig-util": "^5.0.2",
     "ethers": "6.11.0"
   },

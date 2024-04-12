@@ -567,7 +567,7 @@ otherwise order won't be ever filled
 
 | Method | Type |
 | ---------- | ---------- |
-| `getTypedData` | `(domain?: EIP712DomainType) => EIP712TypedData` |
+| `getTypedData` | `(chainId: number) => EIP712TypedData` |
 
 #### :gear: getOrderHash
 
