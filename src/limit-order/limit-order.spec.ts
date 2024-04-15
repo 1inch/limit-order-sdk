@@ -61,6 +61,8 @@ describe('Limit Order', () => {
             ext
         )
 
-        expect(LimitOrder.fromCalldata(order.toCalldata())).toEqual(order)
+        expect(LimitOrder.fromDataAndExtension(order.build(), ext)).toEqual(
+            order
+        )
     })
 })
