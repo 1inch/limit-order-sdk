@@ -96,7 +96,6 @@ export class ExtensionBuilder implements IExtensionBuilder {
 
     public withCustomData(data: string): this {
         assert(isHexString(data), 'Custom data must be valid hex string')
-        this.customData = trim0x(data)
 
         return this
     }
