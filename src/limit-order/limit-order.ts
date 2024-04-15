@@ -96,8 +96,9 @@ export class LimitOrder {
         }
 
         const hash = salt & UINT_160_MAX
+        const expectedHash = extension.keccak256() & UINT_160_MAX
         assert(
-            hash === extension.keccak256(),
+            hash === expectedHash,
             'invalid salt: lowest 160 bits should be extension hash'
         )
 
