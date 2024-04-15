@@ -50,14 +50,16 @@ export class LimitOrder {
         this.takerAsset = orderInfo.takerAsset
         this.makingAmount = orderInfo.makingAmount
         this.takingAmount = orderInfo.takingAmount
-        this.salt = orderInfo.salt || LimitOrder.buildSalt(extension)
+        this.salt = LimitOrder.verifySalt(
+            orderInfo.salt || LimitOrder.buildSalt(extension),
+            extension
+        )
         this.maker = orderInfo.maker
         this.receiver = orderInfo.receiver?.equal(orderInfo.maker)
             ? Address.ZERO_ADDRESS
             : orderInfo.receiver || Address.ZERO_ADDRESS
         this.makerTraits = makerTraits
 
-        assert(this.salt <= UINT_256_MAX, 'salt too big')
         assert(this.makingAmount <= UINT_256_MAX, 'makingAmount too big')
         assert(this.takingAmount <= UINT_256_MAX, 'takingAmount too big')
 
@@ -84,6 +86,22 @@ export class LimitOrder {
         }
 
         return (baseSalt << 160n) | (extension.keccak256() & UINT_160_MAX)
+    }
+
+    static verifySalt(salt: bigint, extension: Extension): bigint {
+        assert(salt <= UINT_256_MAX, 'salt too big')
+
+        if (extension.isEmpty()) {
+            return salt
+        }
+
+        const hash = salt & UINT_160_MAX
+        assert(
+            hash === extension.keccak256(),
+            'invalid salt: lowest 160 bits should be extension hash'
+        )
+
+        return salt
     }
 
     static fromCalldata(bytes: string): LimitOrder {
