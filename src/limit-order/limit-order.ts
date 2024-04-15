@@ -119,7 +119,7 @@ export class LimitOrder {
 
         return new LimitOrder(
             {
-                salt: order.salt && BigInt(order.salt),
+                salt: order.salt ? BigInt(order.salt) : undefined,
                 maker: new Address(order.maker),
                 receiver: new Address(order.receiver),
                 takingAmount: BigInt(order.takingAmount),
@@ -128,6 +128,25 @@ export class LimitOrder {
                 makerAsset: new Address(order.makerAsset)
             },
             new MakerTraits(BigInt(order.makerTraits))
+        )
+    }
+
+    static fromDataAndExtension(
+        data: LimitOrderV4Struct,
+        extension: Extension
+    ): LimitOrder {
+        return new LimitOrder(
+            {
+                salt: BigInt(data.salt),
+                maker: new Address(data.maker),
+                receiver: new Address(data.receiver),
+                takingAmount: BigInt(data.takingAmount),
+                makingAmount: BigInt(data.makingAmount),
+                takerAsset: new Address(data.takerAsset),
+                makerAsset: new Address(data.makerAsset)
+            },
+            new MakerTraits(BigInt(data.makerTraits)),
+            extension
         )
     }
 
