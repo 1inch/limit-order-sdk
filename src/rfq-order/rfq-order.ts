@@ -1,4 +1,10 @@
-import {LimitOrder, MakerTraits, OrderInfoData} from '../limit-order'
+import {
+    ExtensionBuilder,
+    Interaction,
+    LimitOrder,
+    MakerTraits,
+    OrderInfoData
+} from '../limit-order'
 import {Address} from '../address'
 
 /**
@@ -19,10 +25,11 @@ export class RfqOrder extends LimitOrder {
              * Max value is UINT_40_MAX
              */
             nonce: bigint
+            permit?: Interaction
             usePermit2?: boolean
         }
     ) {
-        const {allowedSender, nonce, expiration, usePermit2} = options
+        const {allowedSender, nonce, expiration, usePermit2, permit} = options
 
         const makerTraits = new MakerTraits(0n)
             .disableMultipleFills()
@@ -34,10 +41,16 @@ export class RfqOrder extends LimitOrder {
             makerTraits.withAllowedSender(allowedSender)
         }
 
+        const extension = new ExtensionBuilder()
+
+        if (permit) {
+            extension.withMakerPermit(permit.target, permit.data)
+        }
+
         if (usePermit2) {
             makerTraits.enablePermit2()
         }
 
-        super(orderInfo, makerTraits)
+        super(orderInfo, makerTraits, extension.build())
     }
 }

@@ -74,10 +74,10 @@ export class ExtensionBuilder implements IExtensionBuilder {
         return this
     }
 
-    public withMakerPermit(tokenFrom: Address, permitData: string): this {
+    public withMakerPermit(permitAddress: Address, permitData: string): this {
         assert(isHexString(permitData), 'Permit data must be valid hex string')
 
-        this.makerPermit = tokenFrom.toString() + trim0x(permitData)
+        this.makerPermit = permitAddress.toString() + trim0x(permitData)
 
         return this
     }
