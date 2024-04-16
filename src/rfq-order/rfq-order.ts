@@ -19,9 +19,10 @@ export class RfqOrder extends LimitOrder {
              * Max value is UINT_40_MAX
              */
             nonce: bigint
+            usePermit2?: boolean
         }
     ) {
-        const {allowedSender, nonce, expiration} = options
+        const {allowedSender, nonce, expiration, usePermit2} = options
 
         const makerTraits = new MakerTraits(0n)
             .disableMultipleFills()
@@ -31,6 +32,10 @@ export class RfqOrder extends LimitOrder {
 
         if (allowedSender) {
             makerTraits.withAllowedSender(allowedSender)
+        }
+
+        if (usePermit2) {
+            makerTraits.enablePermit2()
         }
 
         super(orderInfo, makerTraits)
