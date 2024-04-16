@@ -25,7 +25,7 @@ describe('RfqOrder', () => {
     })
 })
 
-it('should create RfqOrder with permit', () => {
+it('should create RfqOrder with permit2', () => {
     const order = new RfqOrder(
         {
             makerAsset: new Address(
@@ -41,13 +41,9 @@ it('should create RfqOrder with permit', () => {
         {
             nonce: 1n,
             expiration: 1000n,
-            permit: {
-                isPermit2: true,
-                data: '0xdeadbeef'
-            }
+            usePermit2: true
         }
     )
 
-    expect(order.extension.hasMakerPermit).toEqual(true)
     expect(order.makerTraits.isPermit2()).toEqual(true)
 })
