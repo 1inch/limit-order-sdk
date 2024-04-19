@@ -1,4 +1,4 @@
-import {SignTypedDataVersion, TypedDataUtils} from '@metamask/eth-sig-util'
+import {ethers} from 'ethers'
 import {
     EIP712Domain,
     LimitOrderV4TypeDataName,
@@ -10,13 +10,10 @@ import {LimitOrderV4Struct} from '../types'
 import {getLimitOrderContract} from '../../constants'
 
 export function getOrderHash(data: EIP712TypedData): string {
-    return (
-        '0x' +
-        TypedDataUtils.eip712Hash(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            data as any,
-            SignTypedDataVersion.V4
-        ).toString('hex')
+    return ethers.TypedDataEncoder.hash(
+        data.domain,
+        {Order: data.types.Order},
+        data.message
     )
 }
 
@@ -41,14 +38,10 @@ export function getDomainSeparator(
     chainId: number,
     verifyingContract: string
 ): string {
-    return (
-        '0x' +
-        TypedDataUtils.hashStruct(
-            'EIP712Domain',
-            {name, version, chainId, verifyingContract},
-            {EIP712Domain},
-            SignTypedDataVersion.V4
-        ).toString('hex')
+    return ethers.TypedDataEncoder.hashStruct(
+        'EIP712Domain',
+        {EIP712Domain: EIP712Domain},
+        {name, version, chainId, verifyingContract}
     )
 }
 
