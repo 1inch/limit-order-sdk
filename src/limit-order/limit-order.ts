@@ -46,6 +46,17 @@ export class LimitOrder {
         makerTraits = new MakerTraits(0n),
         public readonly extension: Extension = Extension.default()
     ) {
+        assert(
+            !orderInfo.takerAsset.isNative(),
+            // eslint-disable-next-line max-len
+            `${orderInfo.takerAsset} can not be 'takerAsset'. Use wrapper address as 'takerAsset' and 'makerTraits.enableNativeUnwrap' to swap to NATIVE currency`
+        )
+
+        assert(
+            !orderInfo.makerAsset.isNative(),
+            'Maker asset can not be NATIVE, use wrapper'
+        )
+
         this.makerAsset = orderInfo.makerAsset
         this.takerAsset = orderInfo.takerAsset
         this.makingAmount = orderInfo.makingAmount
