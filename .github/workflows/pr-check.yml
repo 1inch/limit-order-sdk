@@ -32,3 +32,6 @@ jobs:
 
       - name: Unit tests
         run: pnpm test
+
+      - name: Security
+        run: pnpm audit
