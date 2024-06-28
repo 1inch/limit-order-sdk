@@ -6,11 +6,18 @@
   "license": "MIT",
   "private": false,
   "exports": {
-    ".": "./dist/index.js",
-    "./axios": "./dist/axios-ext.js"
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./axios": {
+      "import": "./dist/esm/axios-ext.js",
+      "require": "./dist/cjs/axios-ext.js"
+    }
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "module": "dist/esm/index.js",
+  "main": "dist/cjs/index.js",
+  "types": "dist/types/src/index.d.ts",
   "files": [
     "dist",
     "LICENSE",
@@ -22,7 +29,10 @@
     "url": "ssh://git@github.com:1inch/limit-order-sdk.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build:esm && npm run build:cjs && npm run build:types",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:types": "tsc --project tsconfig.types.json",
     "docs:generate": "tsdoc --src=src/limit-order/* --dest=src/limit-order/README.md && tsdoc --src=src/limit-order-contract/* --dest=src/limit-order-contract/README.md",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:ci": "eslint \"{src,apps,libs,test}/**/*.ts\"",
