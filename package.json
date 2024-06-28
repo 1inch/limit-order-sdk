@@ -9,7 +9,7 @@
     "./axios": {
       "import": "./dist/esm/axios-ext.js",
       "require": "./dist/cjs/axios-ext.js",
-      "types": "./dist/types/axios-ext.d.ts"
+      "types": "./dist/types/src/axios-ext.d.ts"
     }
   },
   "module": "dist/esm/index.js",
