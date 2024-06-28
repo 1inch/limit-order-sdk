@@ -1,6 +1,9 @@
 {
   "extends": "@1inch/tsconfig",
   "compilerOptions": {
+    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "importHelpers": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "lib": [
