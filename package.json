@@ -6,10 +6,17 @@
   "license": "MIT",
   "private": false,
   "exports": {
+    ".": {
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
     "./axios": {
+      "types": "./dist/types/src/axios-ext.d.ts",
       "import": "./dist/esm/axios-ext.js",
-      "require": "./dist/cjs/axios-ext.js",
-      "types": "./dist/types/src/axios-ext.d.ts"
+      "default": "./dist/esm/axios-ext.js",
+      "require": "./dist/cjs/axios-ext.js"
     }
   },
   "module": "dist/esm/index.js",
