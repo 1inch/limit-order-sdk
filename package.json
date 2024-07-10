@@ -9,14 +9,16 @@
     ".": {
       "types": "./dist/types/src/index.d.ts",
       "import": "./dist/esm/index.js",
-      "default": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "require": "./dist/cjs/index.js",
+      "node": "./dist/cjs/index.js",
+      "default": "./dist/cjs/index.js"
     },
     "./axios": {
       "types": "./dist/types/src/axios-ext.d.ts",
       "import": "./dist/esm/axios-ext.js",
-      "default": "./dist/esm/axios-ext.js",
-      "require": "./dist/cjs/axios-ext.js"
+      "require": "./dist/cjs/axios-ext.js",
+      "node": "./dist/cjs/axios-ext.js",
+      "default": "./dist/cjs/axios-ext.js"
     }
   },
   "module": "dist/esm/index.js",
