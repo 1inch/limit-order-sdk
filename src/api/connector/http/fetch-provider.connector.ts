@@ -1,5 +1,5 @@
-import {Headers, HttpProviderConnector} from './http-provider.connector'
-import {AuthError} from '../../errors'
+import {Headers, HttpProviderConnector} from './http-provider.connector.js'
+import {AuthError} from '../../errors.js'
 
 export class FetchProviderConnector implements HttpProviderConnector {
     async get<T>(url: string, headers: Headers): Promise<T> {

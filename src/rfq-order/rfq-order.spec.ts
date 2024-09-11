@@ -1,5 +1,5 @@
-import {RfqOrder} from './rfq-order'
-import {Address} from '../address'
+import {RfqOrder} from './rfq-order.js'
+import {Address} from '../address.js'
 
 describe('RfqOrder', () => {
     it('Should validate max nonce', () => {

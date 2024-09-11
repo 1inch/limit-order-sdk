@@ -1,8 +1,8 @@
 import {BitMask, BN, getBytesCount, trim0x} from '@1inch/byte-utils'
-import {Extension} from './extension'
-import {Interaction} from './interaction'
-import {Address} from '../address'
-import {ZX} from '../constants'
+import {Extension} from './extension.js'
+import {Interaction} from './interaction.js'
+import {Address} from '../address.js'
+import {ZX} from '../constants.js'
 
 export enum AmountMode {
     /**

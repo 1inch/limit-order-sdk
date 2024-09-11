@@ -4,10 +4,10 @@ import {
     LimitOrderV4TypeDataName,
     LimitOrderV4TypeDataVersion,
     Order
-} from './domain'
-import {EIP712DomainType, EIP712TypedData} from './eip712.types'
-import {LimitOrderV4Struct} from '../types'
-import {getLimitOrderContract} from '../../constants'
+} from './domain.js'
+import {EIP712DomainType, EIP712TypedData} from './eip712.types.js'
+import {LimitOrderV4Struct} from '../types.js'
+import {getLimitOrderContract} from '../../constants.js'
 
 export function getOrderHash(data: EIP712TypedData): string {
     return ethers.TypedDataEncoder.hash(

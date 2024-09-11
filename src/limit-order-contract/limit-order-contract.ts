@@ -1,8 +1,10 @@
 import {Interface, Signature} from 'ethers'
 import assert from 'assert'
-import {LimitOrderV4Struct, TakerTraits} from '../limit-order'
-import LOP_V4_ABI from '../abi/AggregationRouterV6.abi.json'
-import {ZX} from '../constants'
+import {LimitOrderV4Struct, TakerTraits} from '../limit-order/index.js'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import LOP_V4_ABI from '../abi/AggregationRouterV6.abi.json' assert {type: 'json'}
+import {ZX} from '../constants.js'
 
 const lopContract = new Interface(LOP_V4_ABI)
 

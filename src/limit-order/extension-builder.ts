@@ -1,10 +1,10 @@
 import {isHexString, trim0x} from '@1inch/byte-utils'
 import assert from 'assert'
-import {Extension} from './extension'
-import {IExtensionBuilder} from './types'
-import {Interaction} from './interaction'
-import {Address} from '../address'
-import {ZX} from '../constants'
+import {Extension} from './extension.js'
+import {IExtensionBuilder} from './types.js'
+import {Interaction} from './interaction.js'
+import {Address} from '../address.js'
+import {ZX} from '../constants.js'
 
 export class ExtensionBuilder implements IExtensionBuilder {
     private makerAssetSuffix = ZX

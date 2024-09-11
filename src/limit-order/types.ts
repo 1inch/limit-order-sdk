@@ -1,5 +1,5 @@
-import {Extension} from './extension'
-import {Address} from '../address'
+import {Extension} from './extension.js'
+import {Address} from '../address.js'
 
 export type OrderInfoData = {
     makerAsset: Address

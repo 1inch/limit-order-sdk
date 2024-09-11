@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {isInt} from '../validations'
+import {isInt} from '../validations.js'
 
 export class Pager {
     public readonly limit: number

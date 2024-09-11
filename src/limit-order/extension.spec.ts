@@ -1,4 +1,4 @@
-import {Extension} from './extension'
+import {Extension} from './extension.js'
 
 describe('Extension', () => {
     it('should encode/decode', () => {

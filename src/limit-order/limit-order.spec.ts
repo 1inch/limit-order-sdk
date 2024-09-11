@@ -1,7 +1,7 @@
-import {LimitOrder} from './limit-order'
-import {ExtensionBuilder} from './extension-builder'
-import {MakerTraits} from './maker-traits'
-import {Address} from '../address'
+import {LimitOrder} from './limit-order.js'
+import {ExtensionBuilder} from './extension-builder.js'
+import {MakerTraits} from './maker-traits.js'
+import {Address} from '../address.js'
 
 describe('Limit Order', () => {
     jest.spyOn(Math, 'random').mockReturnValue(1)

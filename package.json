@@ -1,10 +1,11 @@
 {
-  "name": "@1inch/limit-order-sdk",
+  "name": "1inch-limit-order-sdk",
   "version": "4.9.3-rc.1",
   "description": "SDK for 1inch Limit Order Protocol",
   "author": "@1inch",
   "license": "MIT",
   "private": false,
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/types/src/index.d.ts",

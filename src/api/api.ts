@@ -1,9 +1,9 @@
-import {ApiConfig, LimitOrderApiItem, SortKey, StatusKey} from './types'
-import {DEV_PORTAL_LIMIT_ORDER_BASE_URL} from './constants'
-import {Headers, HttpProviderConnector} from './connector'
-import {Pager} from './pager'
-import {LimitOrder} from '../limit-order'
-import {Address} from '../address'
+import {ApiConfig, LimitOrderApiItem, SortKey, StatusKey} from './types.js'
+import {DEV_PORTAL_LIMIT_ORDER_BASE_URL} from './constants.js'
+import {Headers, HttpProviderConnector} from './connector/index.js'
+import {Pager} from './pager.js'
+import {LimitOrder} from '../limit-order/index.js'
+import {Address} from '../address.js'
 
 export class Api {
     private readonly baseUrl: string
