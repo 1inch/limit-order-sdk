@@ -1,4 +1,4 @@
-import {Extension} from './extension'
+import {Extension} from './extensions/extension'
 import {Address} from '../address'
 
 export type OrderInfoData = {

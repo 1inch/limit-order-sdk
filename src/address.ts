@@ -42,4 +42,8 @@ export class Address {
     public isZero(): boolean {
         return this.equal(Address.ZERO_ADDRESS)
     }
+
+    public lastHalf(): string {
+        return add0x(this.val.slice(-20))
+    }
 }

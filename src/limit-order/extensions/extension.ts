@@ -1,9 +1,21 @@
 import {keccak256} from 'ethers'
 import {BytesIter, isHexString, trim0x, UINT_32_MAX} from '@1inch/byte-utils'
 import assert from 'assert'
-import {ZX} from '../constants'
+import {ZX} from '../../constants'
 
 export class Extension {
+    public static EMPTY = {
+        makerAssetSuffix: ZX,
+        takerAssetSuffix: ZX,
+        makingAmountData: ZX,
+        takingAmountData: ZX,
+        predicate: ZX,
+        makerPermit: ZX,
+        preInteraction: ZX,
+        postInteraction: ZX,
+        customData: ZX
+    }
+
     private static fields = [
         'makerAssetSuffix',
         'takerAssetSuffix',
@@ -33,19 +45,7 @@ export class Extension {
 
     public readonly customData: string = ZX
 
-    constructor(
-        data = {
-            makerAssetSuffix: ZX,
-            takerAssetSuffix: ZX,
-            makingAmountData: ZX,
-            takingAmountData: ZX,
-            predicate: ZX,
-            makerPermit: ZX,
-            preInteraction: ZX,
-            postInteraction: ZX,
-            customData: ZX
-        }
-    ) {
+    constructor(data = Extension.EMPTY) {
         Object.entries(data).forEach(([key, val]) =>
             assert(
                 isHexString(val) || val === ZX,

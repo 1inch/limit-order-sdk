@@ -9,7 +9,7 @@ import {
 } from './eip712'
 import {LimitOrderV4Struct, OrderInfoData} from './types'
 import {MakerTraits} from './maker-traits'
-import {Extension} from './extension'
+import {Extension} from './extensions/extension'
 import {Address} from '../address'
 import {randBigInt} from '../utils/rand-bigint'
 
