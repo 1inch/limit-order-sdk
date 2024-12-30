@@ -18,8 +18,6 @@ import {Bps} from '../../../bps'
  * @see https://github.com/1inch/limit-order-protocol/blob/master/contracts/extensions/FeeTaker.sol
  */
 export class FeeTakerExtension {
-    public fees: ResolverFee & IntegratorFee
-
     /**
      * 100% = 100000
      * @private
@@ -37,6 +35,8 @@ export class FeeTakerExtension {
      * @private
      */
     private static CUSTOM_RECEIVER_FLAG = 0n
+
+    public fees: ResolverFee & IntegratorFee
 
     private constructor(
         public readonly address: Address,
