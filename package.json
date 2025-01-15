@@ -46,6 +46,7 @@
     "lint:types": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
+    "check": "pnpm lint && pnpm lint:types && pnpm test",
     "changelog:generate": "changelog generate -a"
   },
   "dependencies": {

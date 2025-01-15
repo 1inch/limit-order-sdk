@@ -77,7 +77,7 @@ export class Extension {
             return Extension.default()
         }
 
-        const iter = BytesIter.String(bytes)
+        const iter = BytesIter.HexString(bytes)
         let offsets = BigInt(iter.nextUint256())
         let consumed = 0
 
