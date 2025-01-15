@@ -9,7 +9,7 @@ import {
 } from './eip712'
 import {LimitOrderV4Struct, OrderInfoData} from './types'
 import {MakerTraits} from './maker-traits'
-import {Extension} from './extensions/extension'
+import {Extension} from './extensions'
 import {Address} from '../address'
 import {randBigInt} from '../utils/rand-bigint'
 
@@ -48,7 +48,7 @@ export class LimitOrder {
     ) {
         assert(
             !orderInfo.takerAsset.isNative(),
-            // eslint-disable-next-line max-len
+
             `${orderInfo.takerAsset} can not be 'takerAsset'. Use wrapper address as 'takerAsset' and 'makerTraits.enableNativeUnwrap' to swap to NATIVE currency`
         )
 

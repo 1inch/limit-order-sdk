@@ -1,13 +1,10 @@
 import {BN, BytesBuilder, BytesIter} from '@1inch/byte-utils'
 import assert from 'assert'
-import {
-    Fee,
-    IntegratorFee,
-    Recipients,
-    ResolverFee,
-    WhitelistInfo
-} from './types'
+import {WhitelistInfo} from './types'
 import {mulDiv, Rounding} from './mul-div'
+import {Fees} from './fees'
+import {ResolverFee} from './resolver-fee'
+import {IntegratorFee} from './integrator-fee'
 import {ExtensionBuilder} from '../extension-builder'
 import {Address} from '../../../address'
 import {Interaction} from '../../interaction'
@@ -19,53 +16,30 @@ import {Bps} from '../../../bps'
  */
 export class FeeTakerExtension {
     /**
-     * 100% = 100000
-     * @private
-     */
-    private static BASE_1E5 = 1e5
-
-    /**
-     * 100% = 100
-     * @private
-     */
-    private static BASE_1E2 = 100
-
-    /**
      * Flags for post-interaction data
      * @private
      */
-    private static CUSTOM_RECEIVER_FLAG = 0n
-
-    public fees: ResolverFee & IntegratorFee
+    private static CUSTOM_RECEIVER_FLAG_BIT = 0n
 
     private constructor(
         public readonly address: Address,
-        public readonly recipients: Recipients,
-        fees: Fee,
+        public readonly fees: Fees,
         public readonly whitelist: WhitelistInfo,
         public readonly makerPermit?: Interaction,
-        public readonly extraInteraction?: Interaction
-    ) {
-        this.fees = {
-            integratorFee:
-                'integratorFee' in fees
-                    ? fees.integratorFee
-                    : {share: Bps.ZERO, fee: Bps.ZERO},
-            resolverFee: 'resolverFee' in fees ? fees.resolverFee : Bps.ZERO
-        }
-    }
+        public readonly extraInteraction?: Interaction,
+        public readonly customReceiver?: Address
+    ) {}
 
     static new(
         /**
          * Address of extension
          */
         address: Address,
-        recipients: Recipients,
         /**
          * @see ResolverFee
          * @see IntegratorFee
          */
-        fees: Fee,
+        fees: Fees,
         /**
          * If empty, then KYC token is required to fill order
          */
@@ -76,11 +50,18 @@ export class FeeTakerExtension {
              */
             discount: Bps
         },
-        makerPermit?: Interaction,
-        /**
-         * Will be called after FeeTaker.postInteraction
-         */
-        extraInteraction?: Interaction
+        extra?: {
+            makerPermit?: Interaction
+            /**
+             * In case receiver of taker tokens is not maker
+             */
+            customReceiver?: Address
+
+            /**
+             * Will be called after FeeTaker.postInteraction
+             */
+            extraInteraction?: Interaction
+        }
     ): FeeTakerExtension {
         const _whitelist = {
             addresses: whitelist?.addresses.map((w) => w.lastHalf()) || [],
@@ -89,11 +70,11 @@ export class FeeTakerExtension {
 
         return new FeeTakerExtension(
             address,
-            recipients,
             fees,
             _whitelist,
-            makerPermit,
-            extraInteraction
+            extra?.makerPermit,
+            extra?.extraInteraction,
+            extra?.customReceiver
         )
     }
 
@@ -132,7 +113,7 @@ export class FeeTakerExtension {
         )
 
         // region Parse postInteraction data
-        const interactionBytes = BytesIter.String(extension.postInteraction)
+        const interactionBytes = BytesIter.HexString(extension.postInteraction)
         interactionBytes.nextUint160() // skip address of extension
         const flags = BN.fromHex(interactionBytes.nextUint8())
         const integratorFeeRecipient = new Address(
@@ -141,7 +122,7 @@ export class FeeTakerExtension {
         const protocolFeeRecipient = new Address(interactionBytes.nextUint160())
 
         const customTokensRecipient = flags.getBit(
-            FeeTakerExtension.CUSTOM_RECEIVER_FLAG
+            FeeTakerExtension.CUSTOM_RECEIVER_FLAG_BIT
         )
             ? new Address(interactionBytes.nextUint160())
             : undefined
@@ -149,19 +130,19 @@ export class FeeTakerExtension {
         const feesFromInteraction = {
             integratorFee: Bps.fromFraction(
                 Number(interactionBytes.nextUint16()),
-                FeeTakerExtension.BASE_1E5
+                Fees.BASE_1E5
             ),
             integratorShare: Bps.fromFraction(
                 Number(interactionBytes.nextUint8()),
-                FeeTakerExtension.BASE_1E2
+                Fees.BASE_1E2
             ),
             resolverFee: Bps.fromFraction(
                 Number(interactionBytes.nextUint16()),
-                FeeTakerExtension.BASE_1E5
+                Fees.BASE_1E5
             )
         }
 
-        const whitelistFromInteraction = [] as string[]
+        const whitelistFromInteraction: string[] = []
         const whitelistFromInteractionSize = Number(
             interactionBytes.nextUint8()
         )
@@ -177,29 +158,29 @@ export class FeeTakerExtension {
         //endregion Parse postInteraction data
 
         //region Parse amount data
-        const amountBytes = BytesIter.String(extension.makingAmountData)
+        const amountBytes = BytesIter.HexString(extension.makingAmountData)
         amountBytes.nextUint160() // skip address of extension
         const feesFromAmount = {
             integratorFee: Bps.fromFraction(
                 Number(amountBytes.nextUint16()),
-                FeeTakerExtension.BASE_1E5
+                Fees.BASE_1E5
             ),
             integratorShare: Bps.fromFraction(
                 Number(amountBytes.nextUint8()),
-                FeeTakerExtension.BASE_1E2
+                Fees.BASE_1E2
             ),
             resolverFee: Bps.fromFraction(
                 Number(amountBytes.nextUint16()),
-                FeeTakerExtension.BASE_1E5
+                Fees.BASE_1E5
             )
         }
 
         const whitelistDiscount = Bps.fromFraction(
-            FeeTakerExtension.BASE_1E2 - Number(amountBytes.nextUint8()), // contact uses 1 - discount
-            FeeTakerExtension.BASE_1E2
+            Number(Fees.BASE_1E2) - Number(amountBytes.nextUint8()), // contract uses 1 - discount
+            Fees.BASE_1E2
         )
 
-        const whitelistFromAmount = [] as string[]
+        const whitelistFromAmount: string[] = []
         const whitelistFromAmountSize = Number(amountBytes.nextUint8())
 
         for (let i = 0; i < whitelistFromAmountSize; i++) {
@@ -240,24 +221,29 @@ export class FeeTakerExtension {
 
         return new FeeTakerExtension(
             extensionAddress,
-            {
-                protocolFeeRecipient,
-                integratorFeeRecipient,
-                tokensRecipient: customTokensRecipient
-            },
-            {
-                integratorFee: {
-                    share: feesFromInteraction.integratorShare,
-                    fee: feesFromInteraction.integratorFee
-                },
-                resolverFee: feesFromInteraction.resolverFee
-            },
+            new Fees(
+                feesFromAmount.resolverFee.isZero()
+                    ? ResolverFee.ZERO
+                    : new ResolverFee(
+                          protocolFeeRecipient,
+                          feesFromAmount.resolverFee
+                      ),
+                feesFromAmount.integratorFee.isZero()
+                    ? IntegratorFee.ZERO
+                    : new IntegratorFee(
+                          integratorFeeRecipient,
+                          protocolFeeRecipient,
+                          feesFromAmount.integratorFee,
+                          feesFromAmount.integratorShare
+                      )
+            ),
             {
                 discount: whitelistDiscount,
                 addresses: whitelistFromInteraction
             },
             permit,
-            extraInteraction
+            extraInteraction,
+            customTokensRecipient
         )
     }
 
@@ -288,27 +274,45 @@ export class FeeTakerExtension {
     }
 
     public getTakingAmount(taker: Address, takingAmount: bigint): bigint {
-        const resolverFee = this.isWhitelisted(taker)
-            ? (FeeTakerExtension.BASE_1E2 -
-                  this.whitelist.discount.toFraction(
-                      FeeTakerExtension.BASE_1E2
-                  )) *
-              this.fees.resolverFee.toFraction(FeeTakerExtension.BASE_1E5)
-            : this.fees.resolverFee.toFraction(FeeTakerExtension.BASE_1E5)
-
-        const resolverFeeBN = BigInt(resolverFee)
-        const integratorFeeBN = BigInt(
-            this.fees.integratorFee.fee.toFraction(FeeTakerExtension.BASE_1E5)
-        )
-
-        const baseBN = BigInt(FeeTakerExtension.BASE_1E5)
+        const fees = this.getFeesForTaker(taker)
 
         return mulDiv(
             takingAmount,
-            baseBN + resolverFeeBN + integratorFeeBN,
-            baseBN,
+            Fees.BASE_1E5 + fees.resolverFee + fees.integratorFee,
+            Fees.BASE_1E5,
             Rounding.Ceil
         )
+    }
+
+    public getMakingAmount(taker: Address, makingAmount: bigint): bigint {
+        const fees = this.getFeesForTaker(taker)
+
+        return mulDiv(
+            makingAmount,
+            Fees.BASE_1E5,
+            Fees.BASE_1E5 + fees.resolverFee + fees.integratorFee
+        )
+    }
+
+    private getFeesForTaker(taker: Address): {
+        resolverFee: bigint
+        integratorFee: bigint
+    } {
+        const resolverFee = this.isWhitelisted(taker)
+            ? (Number(Fees.BASE_1E2) -
+                  this.whitelist.discount.toFraction(Fees.BASE_1E2)) *
+              this.fees.resolver.fee.toFraction(Fees.BASE_1E5)
+            : this.fees.resolver.fee.toFraction(Fees.BASE_1E5)
+
+        const resolverFeeBN = BigInt(resolverFee)
+        const integratorFeeBN = BigInt(
+            this.fees.integrator.fee.toFraction(Fees.BASE_1E5)
+        )
+
+        return {
+            resolverFee: resolverFeeBN,
+            integratorFee: integratorFeeBN
+        }
     }
 
     /**
@@ -324,22 +328,12 @@ export class FeeTakerExtension {
      * @see https://github.com/1inch/limit-order-protocol/blob/22a18f7f20acfec69d4f50ce1880e8e662477710/contracts/extensions/AmountGetterWithFee.sol#L56
      */
     private buildAmountGetterData(): string {
-        const integrator =
-            'integratorFee' in this.fees
-                ? {
-                      fee: this.fees.integratorFee.fee.toFraction(
-                          FeeTakerExtension.BASE_1E5
-                      ),
-                      share: this.fees.integratorFee.share.toFraction(
-                          FeeTakerExtension.BASE_1E2
-                      )
-                  }
-                : {fee: 0, share: 0}
+        const integrator = {
+            fee: this.fees.integrator.fee.toFraction(Fees.BASE_1E5),
+            share: this.fees.integrator.share.toFraction(Fees.BASE_1E2)
+        }
 
-        const resolverFee =
-            'resolverFee' in this.fees
-                ? this.fees.resolverFee.toFraction(FeeTakerExtension.BASE_1E5)
-                : 0
+        const resolverFee = this.fees.resolver.fee.toFraction(Fees.BASE_1E5)
 
         const builder = new BytesBuilder()
             .addUint16(BigInt(integrator.fee))
@@ -348,10 +342,8 @@ export class FeeTakerExtension {
             .addUint8(
                 BigInt(
                     // contract expects discount numerator, but class contain discount
-                    FeeTakerExtension.BASE_1E2 -
-                        this.whitelist.discount.toFraction(
-                            FeeTakerExtension.BASE_1E2
-                        )
+                    Number(Fees.BASE_1E2) -
+                        this.whitelist.discount.toFraction(Fees.BASE_1E2)
                 )
             )
             .addUint8(BigInt(this.whitelist.addresses.length))
@@ -381,34 +373,25 @@ export class FeeTakerExtension {
      * @see https://github.com/1inch/limit-order-protocol/blob/22a18f7f20acfec69d4f50ce1880e8e662477710/contracts/extensions/FeeTaker.sol#L114
      */
     private buildInteractionData(): string {
-        const integrator =
-            'integratorFee' in this.fees
-                ? {
-                      fee: this.fees.integratorFee.fee.toFraction(
-                          FeeTakerExtension.BASE_1E5
-                      ),
-                      share: this.fees.integratorFee.share.toFraction(
-                          FeeTakerExtension.BASE_1E2
-                      )
-                  }
-                : {fee: 0, share: 0}
+        const integrator = {
+            fee: this.fees.integrator.fee.toFraction(Fees.BASE_1E5),
+            share: this.fees.integrator.share.toFraction(Fees.BASE_1E2)
+        }
 
-        const resolverFee =
-            'resolverFee' in this.fees
-                ? this.fees.resolverFee.toFraction(FeeTakerExtension.BASE_1E5)
-                : 0
+        const resolverFee = this.fees.resolver.fee.toFraction(Fees.BASE_1E5)
 
-        const flags = this.recipients.tokensRecipient
-            ? new BN(0n).setBit(FeeTakerExtension.CUSTOM_RECEIVER_FLAG, 1)
-            : new BN(0n)
+        const flags = new BN(0n).setBit(
+            FeeTakerExtension.CUSTOM_RECEIVER_FLAG_BIT,
+            Boolean(this.customReceiver)
+        )
 
         const builder = new BytesBuilder()
             .addUint8(flags)
-            .addAddress(this.recipients.integratorFeeRecipient.toString())
-            .addAddress(this.recipients.protocolFeeRecipient.toString())
+            .addAddress(this.fees.integrator.integrator.toString())
+            .addAddress(this.fees.protocol.toString())
 
-        if (this.recipients.tokensRecipient) {
-            builder.addAddress(this.recipients.tokensRecipient.toString())
+        if (this.customReceiver) {
+            builder.addAddress(this.customReceiver.toString())
         }
 
         builder
