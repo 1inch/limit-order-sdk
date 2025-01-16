@@ -127,29 +127,7 @@ export class FeeTakerExtension {
             ? new Address(interactionBytes.nextUint160())
             : undefined
 
-        const feesFromInteraction = {
-            integratorFee: Bps.fromFraction(
-                Number(interactionBytes.nextUint16()),
-                Fees.BASE_1E5
-            ),
-            integratorShare: Bps.fromFraction(
-                Number(interactionBytes.nextUint8()),
-                Fees.BASE_1E2
-            ),
-            resolverFee: Bps.fromFraction(
-                Number(interactionBytes.nextUint16()),
-                Fees.BASE_1E5
-            )
-        }
-
-        const whitelistFromInteraction: string[] = []
-        const whitelistFromInteractionSize = Number(
-            interactionBytes.nextUint8()
-        )
-
-        for (let i = 0; i < whitelistFromInteractionSize; i++) {
-            whitelistFromInteraction.push(interactionBytes.nextBytes(10))
-        }
+        const interactionData = parseAmountData(interactionBytes)
 
         const extraInteraction = interactionBytes.isEmpty()
             ? undefined
@@ -160,32 +138,9 @@ export class FeeTakerExtension {
         //region Parse amount data
         const amountBytes = BytesIter.HexString(extension.makingAmountData)
         amountBytes.nextUint160() // skip address of extension
-        const feesFromAmount = {
-            integratorFee: Bps.fromFraction(
-                Number(amountBytes.nextUint16()),
-                Fees.BASE_1E5
-            ),
-            integratorShare: Bps.fromFraction(
-                Number(amountBytes.nextUint8()),
-                Fees.BASE_1E2
-            ),
-            resolverFee: Bps.fromFraction(
-                Number(amountBytes.nextUint16()),
-                Fees.BASE_1E5
-            )
-        }
 
-        const whitelistDiscount = Bps.fromFraction(
-            Number(Fees.BASE_1E2) - Number(amountBytes.nextUint8()), // contract uses 1 - discount
-            Fees.BASE_1E2
-        )
+        const amountData = parseAmountData(amountBytes)
 
-        const whitelistFromAmount: string[] = []
-        const whitelistFromAmountSize = Number(amountBytes.nextUint8())
-
-        for (let i = 0; i < whitelistFromAmountSize; i++) {
-            whitelistFromAmount.push(amountBytes.nextBytes(10))
-        }
         //endregion Parse amount data
 
         const permit = extension.hasMakerPermit
@@ -193,28 +148,29 @@ export class FeeTakerExtension {
             : undefined
 
         assert(
-            feesFromAmount.integratorFee.value ===
-                feesFromInteraction.integratorFee.value,
+            amountData.fees.integratorFee.value ===
+                interactionData.fees.integratorFee.value,
             `invalid extension: integrator fee must be same in interaction data and in amount data`
         )
         assert(
-            feesFromAmount.resolverFee.value ===
-                feesFromInteraction.resolverFee.value,
+            amountData.fees.resolverFee.value ===
+                interactionData.fees.resolverFee.value,
             `invalid extension: resolver fee must be same in interaction data and in amount data`
         )
         assert(
-            feesFromAmount.integratorShare.value ===
-                feesFromInteraction.integratorShare.value,
+            amountData.fees.integratorShare.value ===
+                interactionData.fees.integratorShare.value,
             `invalid extension: integrator share must be same in interaction data and in amount data`
         )
 
         assert(
-            whitelistFromInteraction.length === whitelistFromAmount.length,
+            interactionData.whitelist.addresses.length ===
+                amountData.whitelist.addresses.length,
             'whitelist must be same in interaction data and in amount data'
         )
         assert(
-            whitelistFromInteraction.every(
-                (val, i) => whitelistFromAmount[i] === val
+            interactionData.whitelist.addresses.every(
+                (val, i) => amountData.whitelist.addresses[i] === val
             ),
             'whitelist must be same in interaction data and in amount data'
         )
@@ -222,25 +178,22 @@ export class FeeTakerExtension {
         return new FeeTakerExtension(
             extensionAddress,
             new Fees(
-                feesFromAmount.resolverFee.isZero()
+                amountData.fees.resolverFee.isZero()
                     ? ResolverFee.ZERO
                     : new ResolverFee(
                           protocolFeeRecipient,
-                          feesFromAmount.resolverFee
+                          amountData.fees.resolverFee
                       ),
-                feesFromAmount.integratorFee.isZero()
+                amountData.fees.integratorFee.isZero()
                     ? IntegratorFee.ZERO
                     : new IntegratorFee(
                           integratorFeeRecipient,
                           protocolFeeRecipient,
-                          feesFromAmount.integratorFee,
-                          feesFromAmount.integratorShare
+                          amountData.fees.integratorFee,
+                          amountData.fees.integratorShare
                       )
             ),
-            {
-                discount: whitelistDiscount,
-                addresses: whitelistFromInteraction
-            },
+            amountData.whitelist,
             permit,
             extraInteraction,
             customTokensRecipient
@@ -364,22 +317,12 @@ export class FeeTakerExtension {
      * 20 bytes — integrator fee recipient
      * 20 bytes - protocol fee recipient
      * [20 bytes] — receiver of taking tokens (optional, if not set, maker is used). See `CUSTOM_RECEIVER_FLAG` flag
-     * 2 bytes — integrator fee percentage (in 1e5)
-     * 1 bytes - integrator rev share percentage (in 1e2)
-     * 2 bytes — resolver fee percentage (in 1e5)
-     * 1 byte - size of the whitelist
-     * (bytes10)[N] whitelisted addresses;
+     * Same as in `buildAmountGetterData`
      * [bytes20, bytes] - optional extra interaction
+     * @see buildAmountGetterData
      * @see https://github.com/1inch/limit-order-protocol/blob/22a18f7f20acfec69d4f50ce1880e8e662477710/contracts/extensions/FeeTaker.sol#L114
      */
     private buildInteractionData(): string {
-        const integrator = {
-            fee: this.fees.integrator.fee.toFraction(Fees.BASE_1E5),
-            share: this.fees.integrator.share.toFraction(Fees.BASE_1E2)
-        }
-
-        const resolverFee = this.fees.resolver.fee.toFraction(Fees.BASE_1E5)
-
         const flags = new BN(0n).setBit(
             FeeTakerExtension.CUSTOM_RECEIVER_FLAG_BIT,
             Boolean(this.customReceiver)
@@ -394,15 +337,7 @@ export class FeeTakerExtension {
             builder.addAddress(this.customReceiver.toString())
         }
 
-        builder
-            .addUint16(BigInt(integrator.fee))
-            .addUint8(BigInt(integrator.share))
-            .addUint16(BigInt(resolverFee))
-            .addUint8(BigInt(this.whitelist.addresses.length))
-
-        for (const halfAddress of this.whitelist.addresses) {
-            builder.addBytes(halfAddress)
-        }
+        builder.addBytes(this.buildAmountGetterData())
 
         if (this.extraInteraction) {
             builder
@@ -411,5 +346,39 @@ export class FeeTakerExtension {
         }
 
         return builder.asHex()
+    }
+}
+
+function parseAmountData(iter: BytesIter<string>): {
+    fees: {integratorFee: Bps; integratorShare: Bps; resolverFee: Bps}
+    whitelist: {addresses: string[]; discount: Bps}
+} {
+    const fees = {
+        integratorFee: Bps.fromFraction(
+            Number(iter.nextUint16()),
+            Fees.BASE_1E5
+        ),
+        integratorShare: Bps.fromFraction(
+            Number(iter.nextUint8()),
+            Fees.BASE_1E2
+        ),
+        resolverFee: Bps.fromFraction(Number(iter.nextUint16()), Fees.BASE_1E5)
+    }
+
+    const whitelistDiscount = Bps.fromFraction(
+        Number(Fees.BASE_1E2) - Number(iter.nextUint8()), // contract uses 1 - discount
+        Fees.BASE_1E2
+    )
+
+    const whitelistAddresses: string[] = []
+    const whitelistFromAmountSize = Number(iter.nextUint8())
+
+    for (let i = 0; i < whitelistFromAmountSize; i++) {
+        whitelistAddresses.push(iter.nextBytes(10))
+    }
+
+    return {
+        fees,
+        whitelist: {discount: whitelistDiscount, addresses: whitelistAddresses}
     }
 }
