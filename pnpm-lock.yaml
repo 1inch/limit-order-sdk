@@ -45,9 +45,6 @@ importers:
       axios:
         specifier: ^1.7.9
         version: 1.7.9
-      bluebird:
-        specifier: 3.7.2
-        version: 3.7.2
       eslint:
         specifier: 9.18.0
         version: 9.18.0
@@ -76,7 +73,7 @@ importers:
         specifier: ^4.1.4
         version: 4.1.4(@typescript-eslint/eslint-plugin@8.20.0(@typescript-eslint/parser@8.20.0(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0)
       generate-changelog:
-        specifier: ^1.8.0
+        specifier: 1.8.0
         version: 1.8.0
       jest:
         specifier: 29.7.0
