@@ -45,6 +45,9 @@ importers:
       axios:
         specifier: ^1.7.9
         version: 1.7.9
+      bluebird:
+        specifier: 3.7.2
+        version: 3.7.2
       eslint:
         specifier: 9.18.0
         version: 9.18.0
@@ -98,6 +101,9 @@ packages:
     engines: {node: '>=18.16.0'}
     peerDependencies:
       assert: ^2.0.0
+    peerDependenciesMeta:
+      assert:
+        optional: true
 
   '@1inch/eslint-config@3.0.6':
     resolution: {integrity: sha512-apfoU2TFLhpBYcVzPJlU80a8WRuMheGA3tDhd27w4X5nkKvA3wZH9vX61NAgJ+0aDNbACd1VDQ2lAcU3xseLfw==, tarball: https://npm.pkg.github.com/download/@1inch/eslint-config/3.0.6/1f938de42af87ffb89875537c3d2171848c3bffb}
@@ -2319,7 +2325,7 @@ packages:
 snapshots:
 
   '@1inch/byte-utils@3.0.0(assert@2.1.0)':
-    dependencies:
+    optionalDependencies:
       assert: 2.1.0
 
   '@1inch/eslint-config@3.0.6(gvpec42qx5b64l5rsqzumk6nm4)':
