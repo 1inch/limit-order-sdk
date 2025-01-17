@@ -55,7 +55,7 @@ jobs:
           git tag v${{ steps.version.outputs.NEW_VERSION }}
           git push
           git push --tags
-          gh release create v${{ steps.version.outputs.NEW_VERSION }} --notes-file CHANGELOG.md
+          gh release create v${{ steps.version.outputs.NEW_VERSION }}
 
       - name: Trigger publish
         env:
