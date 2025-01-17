@@ -32,6 +32,10 @@ export class Bps {
         return new Bps(BigInt(10000 * val) / base)
     }
 
+    public equal(other: Bps): boolean {
+        return this.value === other.value
+    }
+
     public isZero(): boolean {
         return this.value === 0n
     }
