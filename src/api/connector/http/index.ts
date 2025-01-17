@@ -1,2 +1,2 @@
-export * from './http-provider.connector'
-export * from './fetch-provider.connector'
+export * from './http-provider.connector.js'
+export * from './fetch-provider.connector.js'

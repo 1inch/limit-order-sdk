@@ -6,12 +6,12 @@ import {
     getLimitOrderV4Domain,
     getOrderHash,
     EIP712TypedData
-} from './eip712'
-import {LimitOrderV4Struct, OrderInfoData} from './types'
-import {MakerTraits} from './maker-traits'
-import {Extension} from './extension'
-import {Address} from '../address'
-import {randBigInt} from '../utils/rand-bigint'
+} from './eip712/index.js'
+import {LimitOrderV4Struct, OrderInfoData} from './types.js'
+import {MakerTraits} from './maker-traits.js'
+import {Extension} from './extension.js'
+import {Address} from '../address.js'
+import {randBigInt} from '../utils/rand-bigint.js'
 
 export class LimitOrder {
     private static readonly Web3Type = `tuple(${[

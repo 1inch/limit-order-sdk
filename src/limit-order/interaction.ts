@@ -1,6 +1,6 @@
 import {BytesIter, isHexBytes, trim0x} from '@1inch/byte-utils'
 import assert from 'assert'
-import {Address} from '../address'
+import {Address} from '../address.js'
 
 export class Interaction {
     constructor(public readonly target: Address, public readonly data: string) {

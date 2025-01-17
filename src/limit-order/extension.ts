@@ -1,7 +1,7 @@
 import {keccak256} from 'ethers'
 import {BytesIter, isHexString, trim0x, UINT_32_MAX} from '@1inch/byte-utils'
 import assert from 'assert'
-import {ZX} from '../constants'
+import {ZX} from '../constants.js'
 
 export class Extension {
     private static fields = [

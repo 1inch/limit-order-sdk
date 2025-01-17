@@ -1,5 +1,5 @@
-import {HttpProviderConnector} from './connector'
-import {LimitOrderV4Struct} from '../limit-order'
+import {HttpProviderConnector} from './connector/index.js'
+import {LimitOrderV4Struct} from '../limit-order/index.js'
 
 export type ApiConfig = {
     authKey: string
