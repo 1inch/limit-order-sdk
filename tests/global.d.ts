@@ -9,4 +9,5 @@ declare global {
     var maker: TestWallet
     var taker: TestWallet
     var limitOrderProtocolAddress: string
+    var feeTakerExtensionAddress: string
 }
