@@ -12,6 +12,8 @@ import './global.d.ts'
 import {TestWallet} from './test-wallet'
 import {USDC, WETH} from './addresses'
 import LOP from '../dist/contracts/TestLimitOrderProtocol.sol/TestLimitOrderProtocol.json'
+import FeeTakerExt from '../dist/contracts/TestFeeTaker.sol/TestFeeTaker.json'
+import {Address} from '../src'
 
 export default async function setupGlobalSetup(): Promise<void> {
     await startNode()
@@ -47,6 +49,16 @@ async function deployContracts(): Promise<void> {
     )
 
     globalThis.limitOrderProtocolAddress = await deploy(LOP, [WETH], deployer)
+    globalThis.feeTakerExtensionAddress = await deploy(
+        FeeTakerExt,
+        [
+            globalThis.limitOrderProtocolAddress,
+            Address.ZERO_ADDRESS.toString(), // access token
+            WETH,
+            deployer.address // owner
+        ],
+        deployer
+    )
 }
 async function initUsers(): Promise<void> {
     const USDC_DONOR = await TestWallet.fromAddress(
@@ -75,7 +87,6 @@ async function initUsers(): Promise<void> {
         await globalThis.taker.getAddress(),
         parseUnits('100000', 6)
     )
-
     await globalThis.taker.unlimitedApprove(
         USDC,
         globalThis.limitOrderProtocolAddress
