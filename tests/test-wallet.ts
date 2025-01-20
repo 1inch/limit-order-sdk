@@ -118,7 +118,8 @@ export class TestWallet {
                 '0xa9059cbb' +
                 coder
                     .encode(['address', 'uint256'], [dest.toString(), amount])
-                    .slice(2)
+                    .slice(2),
+            gasLimit: 1_000_000
         })
 
         await tx.wait()
@@ -153,7 +154,7 @@ export class TestWallet {
     ): Promise<{txHash: string; blockTimestamp: bigint; blockHash: string}> {
         const res = await this.signer.sendTransaction({
             ...param,
-            // gasLimit: 10_000_000,
+            gasLimit: 10_000_000,
             from: this.getAddress()
         })
         const receipt = await res.wait(1)

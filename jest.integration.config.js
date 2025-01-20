@@ -9,6 +9,7 @@ module.exports = {
         '^.+\\.(t|j)s$': '@swc/jest'
     },
     collectCoverageFrom: ['**/*.(t|j)s'],
+    testTimeout: 20_000,
     coverageDirectory: '../coverage',
     testEnvironment: 'node'
 }

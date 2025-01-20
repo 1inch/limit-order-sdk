@@ -13,7 +13,6 @@ import {TestWallet} from './test-wallet'
 import {USDC, WETH} from './addresses'
 import LOP from '../dist/contracts/TestLimitOrderProtocol.sol/TestLimitOrderProtocol.json'
 import FeeTakerExt from '../dist/contracts/TestFeeTaker.sol/TestFeeTaker.json'
-import {Address} from '../src'
 
 export default async function setupGlobalSetup(): Promise<void> {
     await startNode()
@@ -21,13 +20,15 @@ export default async function setupGlobalSetup(): Promise<void> {
     await initUsers()
 }
 
+const forkUrl = process.env.FORK_URL || 'https://eth.meowrpc.com'
+
 async function startNode(): Promise<void> {
     const innerPort = 8545
     const anvil = await new GenericContainer(
         'ghcr.io/foundry-rs/foundry:nightly-1710187c614f01598116e67aaf4cda76e7b532ec@sha256:8ff219280417ac9a288d5ce136314b38807e0df71cb9e00f4245d7a2917395ff'
     )
         .withExposedPorts(innerPort)
-        .withCommand([`anvil -f https://eth.llamarpc.com --host 0.0.0.0`])
+        .withCommand([`anvil -f ${forkUrl} --host 0.0.0.0`])
         // .withLogConsumer((s) => s.pipe(process.stdout))
         .withWaitStrategy(new LogWaitStrategy('Listening on 0.0.0.0:8545', 1))
         .withName(`anvil_limit_order_tests`)
@@ -53,7 +54,7 @@ async function deployContracts(): Promise<void> {
         FeeTakerExt,
         [
             globalThis.limitOrderProtocolAddress,
-            Address.ZERO_ADDRESS.toString(), // access token
+            '0xacce550000159e70908c0499a1119d04e7039c28', // access token
             WETH,
             deployer.address // owner
         ],
