@@ -125,3 +125,32 @@ const api = new Api({
     httpConnector: new AxiosProviderConnector()
 })
 ```
+
+##  Testing
+
+### Unit tests
+
+Install dependencies
+```shell
+pnpm install
+```
+
+Run tests
+```shell
+pnpm test
+```
+
+### Integration tests
+Integration tests are inside [tests](./tests) folder.
+They use [foundry](https://book.getfoundry.sh/) fork node and execute transaction on it. 
+
+Install dependencies
+```shell
+pnpm install && forge install
+```
+
+Run tests
+```shell
+pnpm test:integration
+```
+

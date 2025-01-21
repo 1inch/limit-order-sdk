@@ -1,5 +1,5 @@
 import {LimitOrder} from './limit-order'
-import {ExtensionBuilder} from './extension-builder'
+import {ExtensionBuilder} from './extensions/extension-builder'
 import {MakerTraits} from './maker-traits'
 import {Address} from '../address'
 

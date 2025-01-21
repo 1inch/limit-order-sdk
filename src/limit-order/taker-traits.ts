@@ -1,5 +1,5 @@
 import {BitMask, BN, getBytesCount, trim0x} from '@1inch/byte-utils'
-import {Extension} from './extension'
+import {Extension} from './extensions/extension'
 import {Interaction} from './interaction'
 import {Address} from '../address'
 import {ZX} from '../constants'

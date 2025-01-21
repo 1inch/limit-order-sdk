@@ -134,6 +134,7 @@ export class MakerTraits {
     /**
      * Set nonce
      * Note: nonce and epoch share the same field, so they cant be set together
+     * @param nonce must be less or equal to `uint40::max`
      */
     public withNonce(nonce: bigint): this {
         this.value = this.value.setMask(MakerTraits.NONCE_OR_EPOCH_MASK, nonce)

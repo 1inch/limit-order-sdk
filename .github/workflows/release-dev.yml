@@ -44,9 +44,6 @@ jobs:
           pnpm version ${{ github.event.inputs.version }} --preid rc --git-tag-version=false
           echo "NEW_VERSION=$(pnpm pkg get version | tr -d '"')" >> "$GITHUB_OUTPUT"
 
-      - name: Generate changelog
-        run: pnpm changelog:generate -t v${{ steps.version.outputs.OLD_VERSION }} || pnpm changelog:generate
-
       - name: Create github release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -58,7 +55,7 @@ jobs:
           git tag v${{ steps.version.outputs.NEW_VERSION }}
           git push
           git push --tags
-          gh release create v${{ steps.version.outputs.NEW_VERSION }} --notes-file CHANGELOG.md
+          gh release create v${{ steps.version.outputs.NEW_VERSION }}
 
       - name: Trigger publish
         env:
