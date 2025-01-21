@@ -38,4 +38,3 @@ Fill contract order (order maker is smart-contract) WITH an extension or taker i
 | Method | Type |
 | ---------- | ---------- |
 | `getFillContractOrderArgsCalldata` | `(order: LimitOrderV4Struct, signature: string, takerTraits: TakerTraits, amount: bigint) => string` |
-

@@ -1,12 +1,12 @@
 import {UINT_40_MAX} from '@1inch/byte-utils'
-import {FeeTakerExtension} from './fee-taker.extension'
-import {LimitOrder} from '../../limit-order'
-import {LimitOrderV4Struct, OrderInfoData} from '../../types'
-import {MakerTraits} from '../../maker-traits'
-import {Extension} from '../extension'
-import {Address} from '../../../address'
-import {calcTakingAmount} from '../../amounts'
-import {randBigInt} from '../../../utils/rand-bigint'
+import {FeeTakerExtension} from './extensions/fee-taker/fee-taker.extension'
+import {LimitOrder} from './limit-order'
+import {LimitOrderV4Struct, OrderInfoData} from './types'
+import {MakerTraits} from './maker-traits'
+import {Extension} from './extensions/extension'
+import {calcMakingAmount, calcTakingAmount} from './amounts'
+import {Address} from '../address'
+import {randBigInt} from '../utils/rand-bigint'
 
 export class LimitOrderWithFee extends LimitOrder {
     constructor(
@@ -51,6 +51,12 @@ export class LimitOrderWithFee extends LimitOrder {
         )
     }
 
+    /**
+     * Calculates the `takingAmount` required from the taker in exchange for the `makingAmount`
+     *
+     * @param taker
+     * @param makingAmount amount to be filled
+     */
     public getTakingAmount(
         taker: Address,
         makingAmount = this.makingAmount
@@ -62,6 +68,25 @@ export class LimitOrderWithFee extends LimitOrder {
         )
 
         return this.feeExtension.getTakingAmount(taker, takingAmount)
+    }
+
+    /**
+     * Calculates the `makingAmount` that the taker receives in exchange for the `takingAmount`
+     *
+     * @param taker
+     * @param takingAmount amount to be filled
+     */
+    public getMakingAmount(
+        taker: Address,
+        takingAmount = this.takingAmount
+    ): bigint {
+        const makingAmount = calcMakingAmount(
+            takingAmount,
+            this.makingAmount,
+            this.takingAmount
+        )
+
+        return this.feeExtension.getMakingAmount(taker, makingAmount)
     }
 
     /**

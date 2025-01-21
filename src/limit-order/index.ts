@@ -1,5 +1,6 @@
 export * from './eip712/index'
 export * from './limit-order'
+export * from './limit-order-with-fee'
 export * from './maker-traits'
 export * from './taker-traits'
 export * from './extensions'

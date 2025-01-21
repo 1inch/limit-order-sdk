@@ -1,7 +1,7 @@
 ## :toolbox: Functions
 
 - [calcTakingAmount](#gear-calctakingamount)
-- [calMakingAmount](#gear-calmakingamount)
+- [calcMakingAmount](#gear-calcmakingamount)
 
 ### :gear: calcTakingAmount
 
@@ -11,157 +11,13 @@ Calculates taker amount by linear proportion
 | ---------- | ---------- |
 | `calcTakingAmount` | `(swapMakerAmount: bigint, orderMakerAmount: bigint, orderTakerAmount: bigint) => bigint` |
 
-### :gear: calMakingAmount
+### :gear: calcMakingAmount
 
 Calculates maker amount by linear proportion
 
 | Function | Type |
 | ---------- | ---------- |
-| `calMakingAmount` | `(swapTakerAmount: bigint, orderMakerAmount: bigint, orderTakerAmount: bigint) => bigint` |
-
-
-## :factory: Extension
-
-### Methods
-
-- [decode](#gear-decode)
-- [default](#gear-default)
-- [keccak256](#gear-keccak256)
-- [isEmpty](#gear-isempty)
-- [encode](#gear-encode)
-
-#### :gear: decode
-
-| Method | Type |
-| ---------- | ---------- |
-| `decode` | `(bytes: string) => Extension` |
-
-#### :gear: default
-
-| Method | Type |
-| ---------- | ---------- |
-| `default` | `() => Extension` |
-
-#### :gear: keccak256
-
-| Method | Type |
-| ---------- | ---------- |
-| `keccak256` | `() => bigint` |
-
-#### :gear: isEmpty
-
-| Method | Type |
-| ---------- | ---------- |
-| `isEmpty` | `() => boolean` |
-
-#### :gear: encode
-
-Hex string with 0x
-
-| Method | Type |
-| ---------- | ---------- |
-| `encode` | `() => string` |
-
-
-## :factory: Interaction
-
-### Methods
-
-- [encode](#gear-encode)
-
-#### :gear: encode
-
-Hex string with 0x. First 20 bytes are target, then data
-
-| Method | Type |
-| ---------- | ---------- |
-| `encode` | `() => string` |
-
-
-## :factory: ExtensionBuilder
-
-### Methods
-
-- [withMakerAssetSuffix](#gear-withmakerassetsuffix)
-- [withTakerAssetSuffix](#gear-withtakerassetsuffix)
-- [withMakingAmountData](#gear-withmakingamountdata)
-- [withTakingAmountData](#gear-withtakingamountdata)
-- [withPredicate](#gear-withpredicate)
-- [withMakerPermit](#gear-withmakerpermit)
-- [withPreInteraction](#gear-withpreinteraction)
-- [withPostInteraction](#gear-withpostinteraction)
-- [withCustomData](#gear-withcustomdata)
-- [build](#gear-build)
-
-#### :gear: withMakerAssetSuffix
-
-| Method | Type |
-| ---------- | ---------- |
-| `withMakerAssetSuffix` | `(suffix: string) => this` |
-
-#### :gear: withTakerAssetSuffix
-
-| Method | Type |
-| ---------- | ---------- |
-| `withTakerAssetSuffix` | `(suffix: string) => this` |
-
-#### :gear: withMakingAmountData
-
-| Method | Type |
-| ---------- | ---------- |
-| `withMakingAmountData` | `(address: Address, data: string) => this` |
-
-Parameters:
-
-* `address`: Address of contract which will be called with `data` to calculate making amount
-
-
-#### :gear: withTakingAmountData
-
-| Method | Type |
-| ---------- | ---------- |
-| `withTakingAmountData` | `(address: Address, data: string) => this` |
-
-Parameters:
-
-* `address`: Address of contract which will be called with `data` to calculate taking amount
-
-
-#### :gear: withPredicate
-
-| Method | Type |
-| ---------- | ---------- |
-| `withPredicate` | `(predicate: string) => this` |
-
-#### :gear: withMakerPermit
-
-| Method | Type |
-| ---------- | ---------- |
-| `withMakerPermit` | `(tokenFrom: Address, permitData: string) => this` |
-
-#### :gear: withPreInteraction
-
-| Method | Type |
-| ---------- | ---------- |
-| `withPreInteraction` | `(interaction: Interaction) => this` |
-
-#### :gear: withPostInteraction
-
-| Method | Type |
-| ---------- | ---------- |
-| `withPostInteraction` | `(interaction: Interaction) => this` |
-
-#### :gear: withCustomData
-
-| Method | Type |
-| ---------- | ---------- |
-| `withCustomData` | `(data: string) => this` |
-
-#### :gear: build
-
-| Method | Type |
-| ---------- | ---------- |
-| `build` | `() => Extension` |
+| `calcMakingAmount` | `(swapTakerAmount: bigint, orderMakerAmount: bigint, orderTakerAmount: bigint) => bigint` |
 
 
 ## :factory: MakerTraits
@@ -263,7 +119,7 @@ If null is return than order has no expiration
 
 | Method | Type |
 | ---------- | ---------- |
-| `expiration` | `() => bigint` |
+| `expiration` | `() => bigint or null` |
 
 #### :gear: withExpiration
 
@@ -294,6 +150,11 @@ Note: nonce and epoch share the same field, so they cant be set together
 | Method | Type |
 | ---------- | ---------- |
 | `withNonce` | `(nonce: bigint) => this` |
+
+Parameters:
+
+* `nonce`: must be less or equal to `uint40::max`
+
 
 #### :gear: withEpoch
 
@@ -521,13 +382,14 @@ Bit invalidator is cheaper in terms of gas, but can be used only when partial fi
 | ---------- | ---------- |
 | `isBitInvalidatorMode` | `() => boolean` |
 
-
 ## :factory: LimitOrder
 
 ### Methods
 
 - [buildSalt](#gear-buildsalt)
+- [verifySalt](#gear-verifysalt)
 - [fromCalldata](#gear-fromcalldata)
+- [fromDataAndExtension](#gear-fromdataandextension)
 - [toCalldata](#gear-tocalldata)
 - [build](#gear-build)
 - [getTypedData](#gear-gettypeddata)
@@ -545,11 +407,23 @@ otherwise order won't be ever filled
 | ---------- | ---------- |
 | `buildSalt` | `(extension: Extension, baseSalt?: bigint) => bigint` |
 
+#### :gear: verifySalt
+
+| Method | Type |
+| ---------- | ---------- |
+| `verifySalt` | `(salt: bigint, extension: Extension) => bigint` |
+
 #### :gear: fromCalldata
 
 | Method | Type |
 | ---------- | ---------- |
 | `fromCalldata` | `(bytes: string) => LimitOrder` |
+
+#### :gear: fromDataAndExtension
+
+| Method | Type |
+| ---------- | ---------- |
+| `fromDataAndExtension` | `(data: LimitOrderV4Struct, extension: Extension) => LimitOrder` |
 
 #### :gear: toCalldata
 
@@ -582,6 +456,178 @@ Returns true if only a specific address can fill order
 | Method | Type |
 | ---------- | ---------- |
 | `isPrivate` | `() => boolean` |
+
+### Properties
+
+- [salt](#gear-salt)
+- [maker](#gear-maker)
+- [receiver](#gear-receiver)
+- [makerAsset](#gear-makerasset)
+- [takerAsset](#gear-takerasset)
+- [makingAmount](#gear-makingamount)
+- [takingAmount](#gear-takingamount)
+- [makerTraits](#gear-makertraits)
+
+#### :gear: salt
+
+| Property | Type |
+| ---------- | ---------- |
+| `salt` | `bigint` |
+
+#### :gear: maker
+
+| Property | Type |
+| ---------- | ---------- |
+| `maker` | `Address` |
+
+#### :gear: receiver
+
+| Property | Type |
+| ---------- | ---------- |
+| `receiver` | `Address` |
+
+#### :gear: makerAsset
+
+| Property | Type |
+| ---------- | ---------- |
+| `makerAsset` | `Address` |
+
+#### :gear: takerAsset
+
+| Property | Type |
+| ---------- | ---------- |
+| `takerAsset` | `Address` |
+
+#### :gear: makingAmount
+
+| Property | Type |
+| ---------- | ---------- |
+| `makingAmount` | `bigint` |
+
+#### :gear: takingAmount
+
+| Property | Type |
+| ---------- | ---------- |
+| `takingAmount` | `bigint` |
+
+#### :gear: makerTraits
+
+| Property | Type |
+| ---------- | ---------- |
+| `makerTraits` | `MakerTraits` |
+
+## :factory: Interaction
+
+### Methods
+
+- [decode](#gear-decode)
+- [encode](#gear-encode)
+
+#### :gear: decode
+
+Create `Interaction` from bytes
+
+| Method | Type |
+| ---------- | ---------- |
+| `decode` | `(bytes: string) => Interaction` |
+
+Parameters:
+
+* `bytes`: Hex string with 0x. First 20 bytes are target, then data
+
+
+#### :gear: encode
+
+Hex string with 0x. First 20 bytes are target, then data
+
+| Method | Type |
+| ---------- | ---------- |
+| `encode` | `() => string` |
+
+## :factory: LimitOrderWithFee
+
+### Methods
+
+- [fromDataAndExtension](#gear-fromdataandextension)
+- [getTakingAmount](#gear-gettakingamount)
+- [getMakingAmount](#gear-getmakingamount)
+- [getResolverFee](#gear-getresolverfee)
+- [getIntegratorFee](#gear-getintegratorfee)
+- [getProtocolFee](#gear-getprotocolfee)
+
+#### :gear: fromDataAndExtension
+
+| Method | Type |
+| ---------- | ---------- |
+| `fromDataAndExtension` | `(data: LimitOrderV4Struct, extension: Extension) => LimitOrderWithFee` |
+
+#### :gear: getTakingAmount
+
+Calculates the `takingAmount` required from the taker in exchange for the `makingAmount`
+
+| Method | Type |
+| ---------- | ---------- |
+| `getTakingAmount` | `(taker: Address, makingAmount?: bigint) => bigint` |
+
+Parameters:
+
+* `makingAmount`: amount to be filled
+
+
+#### :gear: getMakingAmount
+
+Calculates the `makingAmount` that the taker receives in exchange for the `takingAmount`
+
+| Method | Type |
+| ---------- | ---------- |
+| `getMakingAmount` | `(taker: Address, takingAmount?: bigint) => bigint` |
+
+Parameters:
+
+* `takingAmount`: amount to be filled
+
+
+#### :gear: getResolverFee
+
+Fee in `takerAsset` which resolver pays to resolver fee receiver
+
+| Method | Type |
+| ---------- | ---------- |
+| `getResolverFee` | `(taker: Address, makingAmount?: bigint) => bigint` |
+
+Parameters:
+
+* `taker`: who will fill order
+* `makingAmount`: amount wanted to fill
+
+
+#### :gear: getIntegratorFee
+
+Fee in `takerAsset` which integrator gets to integrator wallet
+
+| Method | Type |
+| ---------- | ---------- |
+| `getIntegratorFee` | `(taker: Address, makingAmount?: bigint) => bigint` |
+
+Parameters:
+
+* `taker`: who will fill order
+* `makingAmount`: amount wanted to fill
+
+
+#### :gear: getProtocolFee
+
+Fee in `takerAsset` which protocol gets
+It equals to `share from integrator fee plus resolver fee`
+
+| Method | Type |
+| ---------- | ---------- |
+| `getProtocolFee` | `(taker: Address, makingAmount?: bigint) => bigint` |
+
+Parameters:
+
+* `taker`: who will fill order
+* `makingAmount`: amount wanted to fill
 
 
 ## :factory: TakerTraits
@@ -775,4 +821,17 @@ Sets taker interaction
 | Method | Type |
 | ---------- | ---------- |
 | `encode` | `() => { trait: bigint; args: string; }` |
+
+## :nut_and_bolt: Enum
+
+- [AmountMode](#gear-amountmode)
+
+### :gear: AmountMode
+
+
+
+| Property | Type | Description |
+| ---------- | ---------- | ---------- |
+| `taker` | `` | Amount provided to fill function treated as `takingAmount` and `makingAmount` calculated based on it |
+| `maker` | `` | Amount provided to fill function treated as `makingAmount` and `takingAmount` calculated based on it |
 

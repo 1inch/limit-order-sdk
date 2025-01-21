@@ -39,7 +39,7 @@
     "build:esm": "tsc --project tsconfig.esm.json",
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "build:types": "tsc --project tsconfig.types.json",
-    "docs:generate": "tsdoc --src=src/limit-order/* --dest=src/limit-order/README.md && tsdoc --src=src/limit-order-contract/* --dest=src/limit-order-contract/README.md",
+    "docs:generate": "tsdoc --src=src/limit-order/* --dest=src/limit-order/README.md && tsdoc --src=src/limit-order-contract/* --dest=src/limit-order-contract/README.md && tsdoc --src=src/limit-order/extensions/** --dest=src/limit-order/extensions/README.md",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:ci": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint": "eslint  \"{src,apps,libs,test}/**/*.ts\" --fix",
