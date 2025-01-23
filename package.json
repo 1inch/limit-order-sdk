@@ -19,6 +19,13 @@
       "require": "./dist/cjs/axios-ext.js",
       "node": "./dist/cjs/axios-ext.js",
       "default": "./dist/cjs/axios-ext.js"
+    },
+    "./extensions/fee-taker": {
+      "types": "./dist/types/src/fee-taker-ext.d.ts",
+      "import": "./dist/esm/fee-taker-ext.js",
+      "require": "./dist/cjs/fee-taker-ext.js",
+      "node": "./dist/cjs/fee-taker-ext.js",
+      "default": "./dist/cjs/fee-taker-ext.js"
     }
   },
   "module": "dist/esm/index.js",
