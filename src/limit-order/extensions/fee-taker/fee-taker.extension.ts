@@ -150,6 +150,12 @@ export class FeeTakerExtension {
                 interactionData.fees.resolverFee.value,
             `invalid extension: resolver fee must be same in interaction data and in amount data`
         )
+
+        assert(
+            amountData.whitelist.discount.value ===
+                interactionData.whitelist.discount.value,
+            `invalid extension: whitelist discount fee must be same in interaction data and in amount data`
+        )
         assert(
             amountData.fees.integratorShare.value ===
                 interactionData.fees.integratorShare.value,
