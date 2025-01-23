@@ -29,10 +29,7 @@ describe('LimitOrderWithFee', () => {
                     Bps.fromPercent(5)
                 )
             ),
-            {
-                discount: Bps.fromPercent(1),
-                addresses: [Address.fromBigInt(100n)]
-            },
+            [Address.fromBigInt(100n)],
             {
                 makerPermit: new Interaction(
                     Address.fromBigInt(1n),
