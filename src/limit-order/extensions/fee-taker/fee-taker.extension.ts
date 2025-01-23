@@ -1,6 +1,5 @@
 import {BN, BytesBuilder, BytesIter} from '@1inch/byte-utils'
 import assert from 'assert'
-import {WhitelistInfo} from './types'
 import {mulDiv, Rounding} from './mul-div'
 import {Fees} from './fees'
 import {ResolverFee} from './resolver-fee'
@@ -24,7 +23,10 @@ export class FeeTakerExtension {
     private constructor(
         public readonly address: Address,
         public readonly fees: Fees,
-        public readonly whitelist: WhitelistInfo,
+        /**
+         * Last 10 bytes of addresses
+         */
+        public readonly whitelist: string[],
         public readonly makerPermit?: Interaction,
         public readonly extraInteraction?: Interaction,
         public readonly customReceiver?: Address
@@ -43,13 +45,7 @@ export class FeeTakerExtension {
         /**
          * If empty, then KYC token is required to fill order
          */
-        whitelist?: {
-            addresses: Address[]
-            /**
-             * Whitelisted resolvers have discount on fee
-             */
-            discount: Bps
-        },
+        whitelist?: Address[],
         extra?: {
             makerPermit?: Interaction
             /**
@@ -63,10 +59,7 @@ export class FeeTakerExtension {
             extraInteraction?: Interaction
         }
     ): FeeTakerExtension {
-        const _whitelist = {
-            addresses: whitelist?.addresses.map((w) => w.lastHalf()) || [],
-            discount: whitelist?.discount || Bps.fromPercent(0)
-        }
+        const _whitelist = whitelist?.map((w) => w.lastHalf()) || []
 
         return new FeeTakerExtension(
             address,
@@ -182,7 +175,8 @@ export class FeeTakerExtension {
                     ? ResolverFee.ZERO
                     : new ResolverFee(
                           protocolFeeRecipient,
-                          amountData.fees.resolverFee
+                          amountData.fees.resolverFee,
+                          amountData.whitelist.discount
                       ),
                 amountData.fees.integratorFee.isZero()
                     ? IntegratorFee.ZERO
@@ -193,7 +187,7 @@ export class FeeTakerExtension {
                           amountData.fees.integratorShare
                       )
             ),
-            amountData.whitelist,
+            amountData.whitelist.addresses,
             permit,
             extraInteraction,
             customTokensRecipient
@@ -223,7 +217,7 @@ export class FeeTakerExtension {
     public isWhitelisted(address: Address): boolean {
         const half = address.lastHalf()
 
-        return this.whitelist.addresses.some((w) => w === half)
+        return this.whitelist.some((w) => w === half)
     }
 
     public getTakingAmount(taker: Address, orderTakingAmount: bigint): bigint {
@@ -346,7 +340,9 @@ export class FeeTakerExtension {
     } {
         const discountNumerator = this.isWhitelisted(taker)
             ? (Number(Fees.BASE_1E2) -
-                  this.whitelist.discount.toFraction(Fees.BASE_1E2)) /
+                  this.fees.resolver.whitelistDiscount.toFraction(
+                      Fees.BASE_1E2
+                  )) /
               Number(Fees.BASE_1E2)
             : 1
 
@@ -392,12 +388,14 @@ export class FeeTakerExtension {
                 BigInt(
                     // contract expects discount numerator, but class contain discount
                     Number(Fees.BASE_1E2) -
-                        this.whitelist.discount.toFraction(Fees.BASE_1E2)
+                        this.fees.resolver.whitelistDiscount.toFraction(
+                            Fees.BASE_1E2
+                        )
                 )
             )
-            .addUint8(BigInt(this.whitelist.addresses.length))
+            .addUint8(BigInt(this.whitelist.length))
 
-        for (const halfAddress of this.whitelist.addresses) {
+        for (const halfAddress of this.whitelist) {
             builder.addBytes(halfAddress)
         }
 

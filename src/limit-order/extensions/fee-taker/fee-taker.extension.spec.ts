@@ -19,7 +19,8 @@ describe('FeeTakerExtension', () => {
                 new Fees(
                     new ResolverFee(
                         recipients.protocolFeeRecipient,
-                        Bps.fromPercent(2)
+                        Bps.fromPercent(2),
+                        Bps.fromPercent(1)
                     ),
                     new IntegratorFee(
                         recipients.integratorFeeRecipient,
@@ -28,10 +29,7 @@ describe('FeeTakerExtension', () => {
                         Bps.fromPercent(5)
                     )
                 ),
-                {
-                    discount: Bps.fromPercent(1),
-                    addresses: [Address.fromBigInt(100n)]
-                },
+                [Address.fromBigInt(100n)],
                 {
                     makerPermit: new Interaction(
                         Address.fromBigInt(1n),
@@ -62,10 +60,7 @@ describe('FeeTakerExtension', () => {
                         Bps.fromPercent(2)
                     )
                 ),
-                {
-                    discount: Bps.fromPercent(0),
-                    addresses: [Address.fromBigInt(100n)]
-                }
+                [Address.fromBigInt(100n)]
             )
 
             expect(FeeTakerExtension.fromExtension(extension.build())).toEqual(
@@ -88,10 +83,7 @@ describe('FeeTakerExtension', () => {
                         Bps.fromPercent(5)
                     )
                 ),
-                {
-                    discount: Bps.fromPercent(0),
-                    addresses: [Address.fromBigInt(100n)]
-                }
+                [Address.fromBigInt(100n)]
             )
 
             expect(FeeTakerExtension.fromExtension(extension.build())).toEqual(
@@ -107,10 +99,7 @@ describe('FeeTakerExtension', () => {
             Fees.resolverFee(
                 new ResolverFee(Address.fromBigInt(2n), Bps.fromPercent(1))
             ),
-            {
-                addresses: [takerAddress], // mark taker as whitelisted resolver
-                discount: Bps.ZERO
-            }
+            [takerAddress] // mark taker as whitelisted resolver
         )
 
         const takingAmount = ext.getTakingAmount(takerAddress, 100_000_000n)
@@ -124,10 +113,7 @@ describe('FeeTakerExtension', () => {
             Fees.resolverFee(
                 new ResolverFee(Address.fromBigInt(2n), Bps.fromPercent(1))
             ),
-            {
-                addresses: [takerAddress], // mark taker as whitelisted resolver
-                discount: Bps.ZERO
-            }
+            [takerAddress] // mark taker as whitelisted resolver
         )
 
         const resolverFee = ext.getResolverFee(takerAddress, 100_000_000n)
@@ -146,10 +132,7 @@ describe('FeeTakerExtension', () => {
                     Bps.fromPercent(10) // share
                 )
             ),
-            {
-                addresses: [takerAddress], // mark taker as whitelisted resolver
-                discount: Bps.ZERO
-            }
+            [takerAddress] // mark taker as whitelisted resolver
         )
 
         const integratorFee = ext.getIntegratorFee(takerAddress, 100_000_000n)
@@ -170,10 +153,7 @@ describe('FeeTakerExtension', () => {
                     Bps.fromPercent(10) // share
                 )
             ),
-            {
-                addresses: [takerAddress], // mark taker as whitelisted resolver
-                discount: Bps.ZERO
-            }
+            [takerAddress] // mark taker as whitelisted resolver
         )
 
         const protocolFee = ext.getProtocolFee(takerAddress, 100_000_000n)

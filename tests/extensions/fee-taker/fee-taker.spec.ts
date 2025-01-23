@@ -55,10 +55,7 @@ describe('FeeTakerExtension', () => {
                     Bps.fromPercent(1)
                 )
             ),
-            {
-                addresses: [takerAddress], // mark taker as whitelisted resolver
-                discount: Bps.ZERO
-            }
+            [takerAddress] // mark taker as whitelisted resolver
         )
 
         const order = new LimitOrderWithFee(
@@ -159,10 +156,7 @@ describe('FeeTakerExtension', () => {
                     Bps.fromPercent(50) // share
                 )
             ),
-            {
-                addresses: [takerAddress], // mark taker as whitelisted resolver
-                discount: Bps.ZERO
-            }
+            [takerAddress] // mark taker as whitelisted resolver
         )
 
         const order = new LimitOrderWithFee(
