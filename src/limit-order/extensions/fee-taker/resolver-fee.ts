@@ -1,3 +1,4 @@
+import assert from 'assert'
 import {Address} from '../../../address'
 import {Bps} from '../../../bps'
 
@@ -26,5 +27,10 @@ export class ResolverFee {
         if (fee.isZero() && !whitelistDiscount.isZero()) {
             throw new Error('whitelist discount must be zero if fee is zero')
         }
+
+        assert(
+            this.whitelistDiscount.value % 100n === 0n,
+            `whitelist discount must have percent precision`
+        )
     }
 }

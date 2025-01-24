@@ -128,15 +128,15 @@ export class FeeCalculator {
         integratorFee: bigint
     } {
         const discountNumerator = this.whitelist.isWhitelisted(taker)
-            ? (Number(Fees.BASE_1E2) -
-                  this.fees.resolver.whitelistDiscount.toFraction(
-                      Fees.BASE_1E2
-                  )) /
-              Number(Fees.BASE_1E2)
-            : 1
+            ? Number(Fees.BASE_1E2) -
+              this.fees.resolver.whitelistDiscount.toFraction(Fees.BASE_1E2)
+            : 100
 
         const resolverFee =
-            discountNumerator * this.fees.resolver.fee.toFraction(Fees.BASE_1E5)
+            BigInt(
+                discountNumerator *
+                    this.fees.resolver.fee.toFraction(Fees.BASE_1E5)
+            ) / Fees.BASE_1E2
 
         const resolverFeeBN = BigInt(resolverFee)
         const integratorFeeBN = BigInt(
