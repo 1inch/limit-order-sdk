@@ -3,7 +3,8 @@ import assert from 'assert'
 import {Fees} from './fees'
 import {ResolverFee} from './resolver-fee'
 import {IntegratorFee} from './integrator-fee'
-import {mulDiv, Rounding} from '../../../utils/mul-div'
+import {WhitelistHalfAddress} from './whitelist-half-address'
+import {FeeCalculator} from './fee-calculator'
 import {ExtensionBuilder} from '../extension-builder'
 import {Address} from '../../../address'
 import {Interaction} from '../../interaction'
@@ -23,10 +24,7 @@ export class FeeTakerExtension {
     private constructor(
         public readonly address: Address,
         public readonly fees: Fees,
-        /**
-         * Last 10 bytes of addresses
-         */
-        public readonly whitelist: string[],
+        public readonly whitelist: WhitelistHalfAddress,
         public readonly makerPermit?: Interaction,
         public readonly extraInteraction?: Interaction,
         public readonly customReceiver?: Address
@@ -59,12 +57,10 @@ export class FeeTakerExtension {
             extraInteraction?: Interaction
         }
     ): FeeTakerExtension {
-        const _whitelist = whitelist?.map((w) => w.lastHalf()) || []
-
         return new FeeTakerExtension(
             address,
             fees,
-            _whitelist,
+            WhitelistHalfAddress.new(whitelist || []),
             extra?.makerPermit,
             extra?.extraInteraction,
             extra?.customReceiver
@@ -193,11 +189,15 @@ export class FeeTakerExtension {
                           amountData.fees.integratorShare
                       )
             ),
-            amountData.whitelist.addresses,
+            new WhitelistHalfAddress(amountData.whitelist.addresses),
             permit,
             extraInteraction,
             customTokensRecipient
         )
+    }
+
+    public getFeeCalculator(): FeeCalculator {
+        return new FeeCalculator(this.fees, this.whitelist)
     }
 
     public build(): Extension {
@@ -220,106 +220,59 @@ export class FeeTakerExtension {
         return builder.build()
     }
 
-    public isWhitelisted(address: Address): boolean {
-        const half = address.lastHalf()
-
-        return this.whitelist.some((w) => w === half)
+    /**
+     * Returns takingAmount with applied fees to it
+     *
+     * @param taker address which fill order
+     * @param takingAmount amount to apply fee to
+     */
+    public getTakingAmount(taker: Address, takingAmount: bigint): bigint {
+        return this.getFeeCalculator().getTakingAmount(taker, takingAmount)
     }
 
-    public getTakingAmount(taker: Address, orderTakingAmount: bigint): bigint {
-        const fees = this.getFeesForTaker(taker)
-
-        return mulDiv(
-            orderTakingAmount,
-            Fees.BASE_1E5 + fees.resolverFee + fees.integratorFee,
-            Fees.BASE_1E5,
-            Rounding.Ceil
-        )
-    }
-
+    /**
+     * Returns makingAmount with applied fees to it
+     *
+     * @param taker address which fill order
+     * @param makingAmount amount to apply fee to
+     */
     public getMakingAmount(taker: Address, makingAmount: bigint): bigint {
-        const fees = this.getFeesForTaker(taker)
-
-        return mulDiv(
-            makingAmount,
-            Fees.BASE_1E5,
-            Fees.BASE_1E5 + fees.resolverFee + fees.integratorFee
-        )
+        return this.getFeeCalculator().getMakingAmount(taker, makingAmount)
     }
 
     /**
      * Fee in `takerAsset` which resolver pays to resolver fee receiver
      *
      * @param taker who will fill order
-     * @param orderTakingAmount taking amount from order struct
+     * @param takingAmount taking amount to apply fee to
      */
-    public getResolverFee(taker: Address, orderTakingAmount: bigint): bigint {
-        // the logic copied from contract to avoid calculation issues
-        // @see https://github.com/1inch/limit-order-protocol/blob/22a18f7f20acfec69d4f50ce1880e8e662477710/contracts/extensions/FeeTaker.sol#L145
-
-        const takingAmount = this.getTakingAmount(taker, orderTakingAmount)
-        const fees = this.getFeesForTaker(taker)
-
-        return mulDiv(
-            takingAmount,
-            fees.resolverFee,
-            Fees.BASE_1E5 + fees.resolverFee + fees.integratorFee
-        )
+    public getResolverFee(taker: Address, takingAmount: bigint): bigint {
+        return this.getFeeCalculator().getResolverFee(taker, takingAmount)
     }
 
     /**
      * Fee in `takerAsset` which integrator gets to integrator wallet
      *
      * @param taker who will fill order
-     * @param orderTakingAmount taking amount from order struct
+     * @param takingAmount taking amount to calculate fee from
      */
-    public getIntegratorFee(taker: Address, orderTakingAmount: bigint): bigint {
-        // the logic copied from contract to avoid calculation issues
-        // @see https://github.com/1inch/limit-order-protocol/blob/22a18f7f20acfec69d4f50ce1880e8e662477710/contracts/extensions/FeeTaker.sol#L145
-
-        const takingAmount = this.getTakingAmount(taker, orderTakingAmount)
-        const fees = this.getFeesForTaker(taker)
-
-        const total = mulDiv(
-            takingAmount,
-            fees.integratorFee,
-            Fees.BASE_1E5 + fees.resolverFee + fees.integratorFee
-        )
-
-        return mulDiv(
-            total,
-            BigInt(this.fees.integrator.share.toFraction(Fees.BASE_1E2)),
-            Fees.BASE_1E2
-        )
+    public getIntegratorFee(taker: Address, takingAmount: bigint): bigint {
+        return this.getFeeCalculator().getIntegratorFee(taker, takingAmount)
     }
 
     /**
      * Fee in `takerAsset` which protocol gets as share from integrator fee
      *
      * @param taker who will fill order
-     * @param orderTakingAmount taking amount from order struct
+     * @param takingAmount taking amount to calculate fee from
      */
     public getProtocolShareOfIntegratorFee(
         taker: Address,
-        orderTakingAmount: bigint
+        takingAmount: bigint
     ): bigint {
-        // the logic copied from contract to avoid calculation issues
-        // @see https://github.com/1inch/limit-order-protocol/blob/22a18f7f20acfec69d4f50ce1880e8e662477710/contracts/extensions/FeeTaker.sol#L145
-
-        const takingAmount = this.getTakingAmount(taker, orderTakingAmount)
-        const fees = this.getFeesForTaker(taker)
-
-        const total = mulDiv(
-            takingAmount,
-            fees.integratorFee,
-            Fees.BASE_1E5 + fees.resolverFee + fees.integratorFee
-        )
-
-        return mulDiv(
-            total,
-            Fees.BASE_1E2 -
-                BigInt(this.fees.integrator.share.toFraction(Fees.BASE_1E2)),
-            Fees.BASE_1E2
+        return this.getFeeCalculator().getProtocolShareOfIntegratorFee(
+            taker,
+            takingAmount
         )
     }
 
@@ -328,42 +281,10 @@ export class FeeTakerExtension {
      * It equals to `share from integrator fee plus resolver fee`
      *
      * @param taker who will fill order
-     * @param orderTakingAmount taking amount from order struct
+     * @param takingAmount taking amount to calculate fee from
      */
-    public getProtocolFee(taker: Address, orderTakingAmount: bigint): bigint {
-        const resolverFee = this.getResolverFee(taker, orderTakingAmount)
-        const integratorPart = this.getProtocolShareOfIntegratorFee(
-            taker,
-            orderTakingAmount
-        )
-
-        return integratorPart + resolverFee
-    }
-
-    private getFeesForTaker(taker: Address): {
-        resolverFee: bigint
-        integratorFee: bigint
-    } {
-        const discountNumerator = this.isWhitelisted(taker)
-            ? (Number(Fees.BASE_1E2) -
-                  this.fees.resolver.whitelistDiscount.toFraction(
-                      Fees.BASE_1E2
-                  )) /
-              Number(Fees.BASE_1E2)
-            : 1
-
-        const resolverFee =
-            discountNumerator * this.fees.resolver.fee.toFraction(Fees.BASE_1E5)
-
-        const resolverFeeBN = BigInt(resolverFee)
-        const integratorFeeBN = BigInt(
-            this.fees.integrator.fee.toFraction(Fees.BASE_1E5)
-        )
-
-        return {
-            resolverFee: resolverFeeBN,
-            integratorFee: integratorFeeBN
-        }
+    public getProtocolFee(taker: Address, takingAmount: bigint): bigint {
+        return this.getFeeCalculator().getProtocolFee(taker, takingAmount)
     }
 
     /**
@@ -399,11 +320,8 @@ export class FeeTakerExtension {
                         )
                 )
             )
-            .addUint8(BigInt(this.whitelist.length))
 
-        for (const halfAddress of this.whitelist) {
-            builder.addBytes(halfAddress)
-        }
+        this.whitelist.encodeTo(builder)
 
         return builder.asHex()
     }
