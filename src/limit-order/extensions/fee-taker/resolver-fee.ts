@@ -30,7 +30,7 @@ export class ResolverFee {
 
         assert(
             this.whitelistDiscount.value % 100n === 0n,
-            `whitelist discount must have percent precision`
+            `whitelist discount must have percent precision: 1%, 2% and so on`
         )
     }
 }
