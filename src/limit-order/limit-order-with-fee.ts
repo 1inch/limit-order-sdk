@@ -1,4 +1,5 @@
 import {UINT_40_MAX} from '@1inch/byte-utils'
+import assert from 'assert'
 import {FeeTakerExtension} from './extensions/fee-taker/fee-taker.extension'
 import {LimitOrder} from './limit-order'
 import {LimitOrderV4Struct, OrderInfoData} from './types'
@@ -36,6 +37,11 @@ export class LimitOrderWithFee extends LimitOrder {
     ): LimitOrderWithFee {
         const makerTraits = new MakerTraits(BigInt(data.makerTraits))
         const feeExt = FeeTakerExtension.fromExtension(extension)
+
+        assert(
+            feeExt.address.equal(new Address(data.receiver)),
+            `invalid order: receiver must be FeeTaker extension address`
+        )
 
         return new LimitOrderWithFee(
             {
