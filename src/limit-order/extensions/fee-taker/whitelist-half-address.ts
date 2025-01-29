@@ -10,6 +10,10 @@ export class WhitelistHalfAddress implements Whitelist {
         private readonly addresses: string[]
     ) {}
 
+    public get length(): number {
+        return this.addresses.length
+    }
+
     static new(addresses: Address[]): WhitelistHalfAddress {
         return new WhitelistHalfAddress(
             addresses?.map((w) => w.lastHalf()) || []
