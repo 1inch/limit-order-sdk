@@ -98,12 +98,7 @@ export class FeeCalculator {
             Fees.BASE_1E5 + fees.resolverFee + fees.integratorFee
         )
 
-        return mulDiv(
-            total,
-            Fees.BASE_1E2 -
-                BigInt(this.fees.integrator.share.toFraction(Fees.BASE_1E2)),
-            Fees.BASE_1E2
-        )
+        return total - this.getIntegratorFee(taker, orderTakingAmount)
     }
 
     /**
