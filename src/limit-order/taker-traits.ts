@@ -210,6 +210,18 @@ export class TakerTraits {
     }
 
     /**
+     * Get threshold amount
+     *
+     * In taker amount mode: the minimum amount a taker agrees to receive in exchange for a taking amount.
+     * In maker amount mode: the maximum amount a taker agrees to give in exchange for a making amount.
+     *
+     * @see AmountMode
+     */
+    public getAmountThreshold(): bigint {
+        return this.flags.getMask(TakerTraits.THRESHOLD_MASK).value
+    }
+
+    /**
      * @see setAmountThreshold
      */
     public removeAmountThreshold(): this {
