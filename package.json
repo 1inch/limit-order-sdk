@@ -105,5 +105,10 @@
   },
   "volta": {
     "node": "20.9.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@babel/helpers@<7.26.10": ">=7.26.10"
+    }
   }
 }
