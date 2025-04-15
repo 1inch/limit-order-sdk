@@ -62,7 +62,7 @@
     "ethers": "6.13.5"
   },
   "devDependencies": {
-    "@1inch/eslint-config": "3.0.6",
+    "@1inch/eslint-config": "3.0.7",
     "@1inch/tsconfig": "1.0.8",
     "@swc/core": "1.10.7",
     "@swc/jest": "0.2.37",
@@ -72,7 +72,7 @@
     "@typescript-eslint/parser": "~8.20.0",
     "axios": "^1.8.4",
     "eslint": "9.18.0",
-    "eslint-config-prettier": "~10.0.3",
+    "eslint-config-prettier": "~10.1.2",
     "eslint-config-standard": "^17.1.0",
     "eslint-import-resolver-typescript": "3.7.0",
     "eslint-plugin-import": "~2.31.0",
