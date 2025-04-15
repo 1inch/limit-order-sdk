@@ -20,15 +20,27 @@ export class LimitOrderWithFee extends LimitOrder {
     ) {
         makerTraits.enablePostInteraction() // to execute extension
 
-        if (!makerTraits.nonceOrEpoch()) {
-            makerTraits.withNonce(randBigInt(UINT_40_MAX))
-        }
-
         super(
             {...orderInfo, receiver: feeExtension.address},
             makerTraits,
             feeExtension.build()
         )
+    }
+
+    /**
+     * Set random nonce to `makerTraits` and creates `LimitOrderWithFee`
+     */
+    static withRandomNonce(
+        /**
+         * Use `FeeTakerExtension.recipients.tokensRecipient` to set custom receiver
+         */
+        orderInfo: Omit<OrderInfoData, 'receiver'>,
+        feeExtension: FeeTakerExtension,
+        makerTraits = new MakerTraits(0n)
+    ): LimitOrderWithFee {
+        makerTraits.withNonce(randBigInt(UINT_40_MAX))
+
+        return new LimitOrderWithFee(orderInfo, makerTraits, feeExtension)
     }
 
     static fromDataAndExtension(
