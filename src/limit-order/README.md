@@ -548,12 +548,21 @@ Hex string with 0x. First 20 bytes are target, then data
 
 ### Methods
 
+- [withRandomNonce](#gear-withrandomnonce)
 - [fromDataAndExtension](#gear-fromdataandextension)
 - [getTakingAmount](#gear-gettakingamount)
 - [getMakingAmount](#gear-getmakingamount)
 - [getResolverFee](#gear-getresolverfee)
 - [getIntegratorFee](#gear-getintegratorfee)
 - [getProtocolFee](#gear-getprotocolfee)
+
+#### :gear: withRandomNonce
+
+Set random nonce to `makerTraits` and creates `LimitOrderWithFee`
+
+| Method | Type |
+| ---------- | ---------- |
+| `withRandomNonce` | `(orderInfo: Omit<OrderInfoData, "receiver">, feeExtension: FeeTakerExtension, makerTraits?: MakerTraits) => LimitOrderWithFee` |
 
 #### :gear: fromDataAndExtension
 
@@ -664,6 +673,7 @@ High bits are used for flags
 - [setExtension](#gear-setextension)
 - [removeExtension](#gear-removeextension)
 - [setAmountThreshold](#gear-setamountthreshold)
+- [getAmountThreshold](#gear-getamountthreshold)
 - [removeAmountThreshold](#gear-removeamountthreshold)
 - [setInteraction](#gear-setinteraction)
 - [removeInteraction](#gear-removeinteraction)
@@ -793,6 +803,17 @@ In maker amount mode: the maximum amount a taker agrees to give in exchange for 
 | Method | Type |
 | ---------- | ---------- |
 | `setAmountThreshold` | `(threshold: bigint) => this` |
+
+#### :gear: getAmountThreshold
+
+Get threshold amount
+
+In taker amount mode: the minimum amount a taker agrees to receive in exchange for a taking amount.
+In maker amount mode: the maximum amount a taker agrees to give in exchange for a making amount.
+
+| Method | Type |
+| ---------- | ---------- |
+| `getAmountThreshold` | `() => bigint` |
 
 #### :gear: removeAmountThreshold
 
