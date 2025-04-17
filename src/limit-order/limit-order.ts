@@ -10,6 +10,7 @@ import {
 import {LimitOrderV4Struct, OrderInfoData} from './types'
 import {MakerTraits} from './maker-traits'
 import {Extension} from './extensions/extension'
+import {injectTrackCode} from './source-track'
 import {Address} from '../address'
 import {randBigInt} from '../utils/rand-bigint'
 
@@ -25,8 +26,6 @@ export class LimitOrder {
         'uint256 makerTraits'
     ]})`
 
-    public readonly salt: bigint
-
     public readonly maker: Address
 
     public readonly receiver: Address
@@ -41,6 +40,8 @@ export class LimitOrder {
 
     public readonly makerTraits: MakerTraits
 
+    private _salt: bigint
+
     constructor(
         orderInfo: OrderInfoData,
         makerTraits = new MakerTraits(0n),
@@ -48,7 +49,6 @@ export class LimitOrder {
     ) {
         assert(
             !orderInfo.takerAsset.isNative(),
-
             `${orderInfo.takerAsset} can not be 'takerAsset'. Use wrapper address as 'takerAsset' and 'makerTraits.enableNativeUnwrap' to swap to NATIVE currency`
         )
 
@@ -61,7 +61,7 @@ export class LimitOrder {
         this.takerAsset = orderInfo.takerAsset
         this.makingAmount = orderInfo.makingAmount
         this.takingAmount = orderInfo.takingAmount
-        this.salt = LimitOrder.verifySalt(
+        this._salt = LimitOrder.verifySalt(
             orderInfo.salt || LimitOrder.buildSalt(extension),
             extension
         )
@@ -77,6 +77,10 @@ export class LimitOrder {
         if (!extension.isEmpty()) {
             this.makerTraits.withExtension()
         }
+    }
+
+    public get salt(): bigint {
+        return this._salt
     }
 
     /**
@@ -160,6 +164,19 @@ export class LimitOrder {
             new MakerTraits(BigInt(data.makerTraits)),
             extension
         )
+    }
+
+    /**
+     * Injects source info to order `salt` [224, 255] bits
+     * check `getTrackCodeForSource` implementation for exact injected data
+     *
+     * @param source order source identifier
+     * @see getTrackCodeForSource
+     */
+    public setSource(source: string): this {
+        this._salt = injectTrackCode(this.salt, source)
+
+        return this
     }
 
     public toCalldata(): string {
