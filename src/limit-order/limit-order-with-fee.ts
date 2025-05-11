@@ -12,10 +12,10 @@ import {randBigInt} from '../utils/rand-bigint'
 export class LimitOrderWithFee extends LimitOrder {
     constructor(
         /**
-         * Use `FeeTakerExtension.recipients.tokensRecipient` to set custom receiver
+         * Use `FeeTakerExtension.customReceiver` to set custom receiver
          */
         orderInfo: Omit<OrderInfoData, 'receiver'>,
-        makerTraits = new MakerTraits(0n),
+        makerTraits = MakerTraits.default(),
         public readonly feeExtension: FeeTakerExtension
     ) {
         makerTraits.enablePostInteraction() // to execute extension
@@ -36,7 +36,7 @@ export class LimitOrderWithFee extends LimitOrder {
          */
         orderInfo: Omit<OrderInfoData, 'receiver'>,
         feeExtension: FeeTakerExtension,
-        makerTraits = new MakerTraits(0n)
+        makerTraits = MakerTraits.default()
     ): LimitOrderWithFee {
         makerTraits.withNonce(randBigInt(UINT_40_MAX))
 

@@ -14,21 +14,27 @@ npm install '@1inch/limit-order-sdk'
 
 ### Order creation
 ```typescript
-import {LimitOrder, MakerTraits, Address} from "@1inch/limit-order-sdk"
+import {LimitOrder, MakerTraits, Address, Sdk, randBigInt, FetchProviderConnector} from "@1inch/limit-order-sdk"
 import {Wallet} from 'ethers'
 
 // it is a well-known test private key, do not use it in production
 const privKey =
     '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
-
+const authKey = '...'
 const maker = new Wallet(privKey)
 const expiresIn = 120n // 2m
 const expiration = BigInt(Math.floor(Date.now() / 1000)) + expiresIn
 
-// see MakerTraits.ts
-const makerTraits = MakerTraits.default().withExpiration(expiration)
+const UINT_40_MAX = (1n << 48n) - 1n
 
-const order = new LimitOrder({
+// see MakerTraits.ts
+const makerTraits = MakerTraits.default()
+  .withExpiration(expiration)
+  .withNonce(randBigInt(UINT_40_MAX))
+
+const sdk = new Sdk({ authKey, networkId: 1, httpConnector: new FetchProviderConnector() })
+
+const order = await sdk.createOrder({
     makerAsset: new Address('0xdac17f958d2ee523a2206206994597c13d831ec7'),
     takerAsset: new Address('0x111111111117dc0aa78b770fa6a738034120c302'),
     makingAmount: 100_000000n, // 100 USDT
@@ -44,6 +50,8 @@ const signature = await maker.signTypedData(
     {Order: typedData.types.Order},
     typedData.message
 )
+
+await sdk.submitOrder(order, signature)
 ```
 
 
@@ -98,8 +106,8 @@ const api = new Api({
     httpConnector: new FetchProviderConnector() // or use any connector which implements `HttpProviderConnector`
 })
 
-// submit order 
-const order = new LimitOrder(...) /// see `Order creation` section
+// submit order
+const order = ... /// see `Order creation` section
 const signature = '0x'
 await api.submitOrder(order, signature)
 
@@ -142,7 +150,7 @@ pnpm test
 
 ### Integration tests
 Integration tests are inside [tests](./tests) folder.
-They use [foundry](https://book.getfoundry.sh/) fork node and execute transaction on it. 
+They use [foundry](https://book.getfoundry.sh/) fork node and execute transaction on it.
 
 Install dependencies
 ```shell
@@ -153,4 +161,3 @@ Run tests
 ```shell
 pnpm test:integration
 ```
-

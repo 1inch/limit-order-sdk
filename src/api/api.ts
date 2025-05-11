@@ -92,6 +92,9 @@ export class Api {
         return this.httpClient.get(this.url(`/order/${hash}`), this.headers())
     }
 
+    /**
+     * Fetch current fee params, only orders with matched params can be submitted to 1inch relayer
+     */
     public async getFeeParams(params: {
         makerAsset: Address
         takerAsset: Address
