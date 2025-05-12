@@ -26,6 +26,7 @@ export class Sdk {
         makerTraits = MakerTraits.default(),
         extra: {
             makerPermit?: Interaction
+            integratorFee?: FeeTakerExt.IntegratorFee
         } = {}
     ): Promise<LimitOrderWithFee> {
         const feeParams = await this.api.getFeeParams({
@@ -35,15 +36,18 @@ export class Sdk {
             takerAmount: orderInfo.takingAmount
         })
 
+        const fees = new FeeTakerExt.Fees(
+            new FeeTakerExt.ResolverFee(
+                new Address(feeParams.protocolFeeReceiver),
+                new Bps(BigInt(feeParams.feeBps)),
+                Bps.fromPercent(feeParams.whitelistDiscountPercent)
+            ),
+            extra.integratorFee ?? FeeTakerExt.IntegratorFee.ZERO
+        )
+
         const feeExt = FeeTakerExt.FeeTakerExtension.new(
             new Address(feeParams.extensionAddress),
-            FeeTakerExt.Fees.resolverFee(
-                new FeeTakerExt.ResolverFee(
-                    new Address(feeParams.protocolFeeReceiver),
-                    new Bps(BigInt(feeParams.feeBps)),
-                    Bps.fromPercent(feeParams.whitelistDiscountPercent)
-                )
-            ),
+            fees,
             feeParams.whitelist.map((w) => new Address(w)),
             {
                 ...extra,
