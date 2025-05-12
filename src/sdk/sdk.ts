@@ -35,15 +35,11 @@ export class Sdk {
             takerAmount: orderInfo.takingAmount
         })
 
-        // todo: return protocol fee address + fee ext address
-        const extAddress = Address.fromBigInt(1)
-        const protocolFeeReceiver = Address.fromBigInt(1)
-
         const feeExt = FeeTakerExt.FeeTakerExtension.new(
-            extAddress,
+            new Address(feeParams.extensionAddress),
             FeeTakerExt.Fees.resolverFee(
                 new FeeTakerExt.ResolverFee(
-                    protocolFeeReceiver,
+                    new Address(feeParams.protocolFeeReceiver),
                     new Bps(BigInt(feeParams.feeBps)),
                     Bps.fromPercent(feeParams.whitelistDiscountPercent)
                 )

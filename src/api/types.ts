@@ -26,6 +26,8 @@ export type FeeInfoDTO = {
     whitelist: string[]
     feeBps: number
     whitelistDiscountPercent: number
+    protocolFeeReceiver: string
+    extensionAddress: string
 }
 
 /**
