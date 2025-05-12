@@ -22,6 +22,14 @@ export type LimitOrderApiItem = {
     orderInvalidReason: null | string[]
 }
 
+export type FeeInfoDTO = {
+    whitelist: string[]
+    feeBps: number
+    whitelistDiscountPercent: number
+    protocolFeeReceiver: string
+    extensionAddress: string
+}
+
 /**
  * 1 - Valid orders,
  * 2 - Temporarily invalid orders,

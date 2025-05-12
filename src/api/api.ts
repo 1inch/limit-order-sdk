@@ -1,4 +1,10 @@
-import {ApiConfig, LimitOrderApiItem, SortKey, StatusKey} from './types'
+import {
+    ApiConfig,
+    FeeInfoDTO,
+    LimitOrderApiItem,
+    SortKey,
+    StatusKey
+} from './types'
 import {DEV_PORTAL_LIMIT_ORDER_BASE_URL} from './constants'
 import {Headers, HttpProviderConnector} from './connector'
 import {Pager} from './pager'
@@ -84,6 +90,26 @@ export class Api {
      */
     public async getOrderByHash(hash: string): Promise<LimitOrderApiItem> {
         return this.httpClient.get(this.url(`/order/${hash}`), this.headers())
+    }
+
+    /**
+     * Fetch current fee params, only orders with matched params can be submitted to 1inch relayer
+     */
+    public async getFeeParams(params: {
+        makerAsset: Address
+        takerAsset: Address
+        makerAmount: bigint
+        takerAmount: bigint
+    }): Promise<FeeInfoDTO> {
+        return this.httpClient.get(
+            this.url(`/fee-info`, {
+                makerAsset: params.makerAsset.toString(),
+                takerAsset: params.takerAsset.toString(),
+                makerAmount: params.makerAmount.toString(),
+                takerAmount: params.takerAmount.toString()
+            }),
+            this.headers()
+        )
     }
 
     private url(path: string, params?: Record<string, string>): string {
