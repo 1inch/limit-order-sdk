@@ -23,7 +23,7 @@ export type LimitOrderApiItem = {
 }
 
 export type FeeInfoDTO = {
-    whitelist: string[]
+    whitelist: Record</*Whitelist*/ string, /*Promotee*/ string>
     feeBps: number
     whitelistDiscountPercent: number
     protocolFeeReceiver: string
