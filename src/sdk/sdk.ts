@@ -48,7 +48,7 @@ export class Sdk {
         const feeExt = FeeTakerExt.FeeTakerExtension.new(
             new Address(feeParams.extensionAddress),
             fees,
-            feeParams.whitelist.map((w) => new Address(w)),
+            Object.values(feeParams.whitelist).map((w) => new Address(w)),
             {
                 ...extra,
                 customReceiver: orderInfo.receiver
