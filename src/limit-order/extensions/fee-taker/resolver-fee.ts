@@ -20,10 +20,6 @@ export class ResolverFee {
             throw new Error('fee must be zero if receiver is zero address')
         }
 
-        if (!receiver.isZero() && fee.isZero()) {
-            throw new Error('receiver must be zero address if fee is zero')
-        }
-
         if (fee.isZero() && !whitelistDiscount.isZero()) {
             throw new Error('whitelist discount must be zero if fee is zero')
         }
