@@ -1,5 +1,5 @@
-import {LimitOrder, MakerTraits, OrderInfoData} from '../limit-order'
-import {Address} from '../address'
+import {LimitOrder, MakerTraits, OrderInfoData} from '../limit-order/index.js'
+import {Address} from '../address.js'
 
 /**
  * Light, gas efficient version of LimitOrder

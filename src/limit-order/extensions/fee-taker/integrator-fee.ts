@@ -1,5 +1,5 @@
-import {Address} from '../../../address'
-import {Bps} from '../../../bps'
+import {Address} from '../../../address.js'
+import {Bps} from '../../../bps.js'
 
 /**
  * Integrator gets `share` of `fee` to `integrator` and the rest goes to `protocol`

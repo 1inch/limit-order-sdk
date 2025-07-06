@@ -1,7 +1,7 @@
-import {Fees} from './fees'
-import {Whitelist} from './types'
-import {Address} from '../../../address'
-import {mulDiv, Rounding} from '../../../utils/mul-div'
+import {Fees} from './fees.js'
+import {Whitelist} from './types.js'
+import {Address} from '../../../address.js'
+import {mulDiv, Rounding} from '../../../utils/mul-div.js'
 
 export class FeeCalculator {
     constructor(

@@ -1,10 +1,10 @@
-import {FeeTakerExtension} from './fee-taker.extension'
-import {Fees} from './fees'
-import {ResolverFee} from './resolver-fee'
-import {IntegratorFee} from './integrator-fee'
-import {Address} from '../../../address'
-import {Bps} from '../../../bps'
-import {Interaction} from '../../interaction'
+import {FeeTakerExtension} from './fee-taker.extension.js'
+import {Fees} from './fees.js'
+import {ResolverFee} from './resolver-fee.js'
+import {IntegratorFee} from './integrator-fee.js'
+import {Address} from '../../../address.js'
+import {Bps} from '../../../bps.js'
+import {Interaction} from '../../interaction.js'
 
 describe('FeeTakerExtension', () => {
     describe('serialize/deserialize', () => {
