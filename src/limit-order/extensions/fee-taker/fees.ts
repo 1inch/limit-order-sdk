@@ -1,7 +1,7 @@
 import assert from 'assert'
-import {ResolverFee} from './resolver-fee'
-import {IntegratorFee} from './integrator-fee'
-import {Address} from '../../../address'
+import {ResolverFee} from './resolver-fee.js'
+import {IntegratorFee} from './integrator-fee.js'
+import {Address} from '../../../address.js'
 
 export class Fees {
     /**

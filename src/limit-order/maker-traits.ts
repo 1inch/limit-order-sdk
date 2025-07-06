@@ -1,6 +1,6 @@
 import {add0x, BitMask, BN} from '@1inch/byte-utils'
 import assert from 'assert'
-import {Address} from '../address'
+import {Address} from '../address.js'
 
 /**
  * The MakerTraits type is an uint256, and different parts of the number are used to encode different traits.

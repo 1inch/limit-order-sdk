@@ -1,13 +1,13 @@
-import {Address} from '../address'
+import {Address} from '../address.js'
 import {
     LimitOrderWithFee,
     MakerTraits,
     OrderInfoData,
     FeeTakerExt,
     Interaction
-} from '../limit-order'
-import {Api, ApiConfig} from '../api'
-import {Bps} from '../bps'
+} from '../limit-order/index.js'
+import {Api, ApiConfig} from '../api/index.js'
+import {Bps} from '../bps.js'
 
 export class Sdk {
     private readonly api: Api

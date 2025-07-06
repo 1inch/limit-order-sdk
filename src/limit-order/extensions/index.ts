@@ -1,3 +1,3 @@
-export * from './extension'
-export * from './extension-builder'
-export * as FeeTakerExt from './fee-taker'
+export * from './extension.js'
+export * from './extension-builder.js'
+export * as FeeTakerExt from './fee-taker/index.js'

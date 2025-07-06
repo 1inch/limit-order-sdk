@@ -1,13 +1,13 @@
 import {UINT_40_MAX} from '@1inch/byte-utils'
 import assert from 'assert'
-import {FeeTakerExtension} from './extensions/fee-taker/fee-taker.extension'
-import {LimitOrder} from './limit-order'
-import {LimitOrderV4Struct, OrderInfoData} from './types'
-import {MakerTraits} from './maker-traits'
-import {Extension} from './extensions/extension'
-import {calcMakingAmount, calcTakingAmount} from './amounts'
-import {Address} from '../address'
-import {randBigInt} from '../utils/rand-bigint'
+import {FeeTakerExtension} from './extensions/fee-taker/fee-taker.extension.js'
+import {LimitOrder} from './limit-order.js'
+import {LimitOrderV4Struct, OrderInfoData} from './types.js'
+import {MakerTraits} from './maker-traits.js'
+import {Extension} from './extensions/extension.js'
+import {calcMakingAmount, calcTakingAmount} from './amounts.js'
+import {Address} from '../address.js'
+import {randBigInt} from '../utils/rand-bigint.js'
 
 export class LimitOrderWithFee extends LimitOrder {
     constructor(

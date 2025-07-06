@@ -1,6 +1,6 @@
 import axios, {isAxiosError} from 'axios'
-import {Headers, HttpProviderConnector} from './http-provider.connector'
-import {AuthError} from '../../errors'
+import {Headers, HttpProviderConnector} from './http-provider.connector.js'
+import {AuthError} from '../../errors.js'
 
 export class AxiosProviderConnector implements HttpProviderConnector {
     async get<T>(url: string, headers: Headers): Promise<T> {

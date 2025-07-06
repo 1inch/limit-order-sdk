@@ -1,9 +1,9 @@
-import {FeeCalculator} from './fee-calculator'
-import {IntegratorFee} from './integrator-fee'
-import {WhitelistHalfAddress} from './whitelist-half-address'
-import {Fees} from './fees'
-import {Address} from '../../../address'
-import {Bps} from '../../../bps'
+import {FeeCalculator} from './fee-calculator.js'
+import {IntegratorFee} from './integrator-fee.js'
+import {WhitelistHalfAddress} from './whitelist-half-address.js'
+import {Fees} from './fees.js'
+import {Address} from '../../../address.js'
+import {Bps} from '../../../bps.js'
 
 describe('FeeCalculator', () => {
     it('should calculate protocol fee amount', () => {

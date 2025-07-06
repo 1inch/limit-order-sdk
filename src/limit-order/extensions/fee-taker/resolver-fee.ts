@@ -1,6 +1,6 @@
 import assert from 'assert'
-import {Address} from '../../../address'
-import {Bps} from '../../../bps'
+import {Address} from '../../../address.js'
+import {Bps} from '../../../bps.js'
 
 /**
  * Fee paid by resolver to `receiver`

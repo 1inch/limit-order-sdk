@@ -43,8 +43,8 @@
   },
   "scripts": {
     "build": "npm run build:esm && npm run build:cjs && npm run build:types",
-    "build:esm": "tsc --project tsconfig.esm.json",
-    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:esm": "swc --config-file esm.swcrc ./src -d dist/esm --strip-leading-paths --copy-files && node -e 'const pkg = require(\"./package.json\"); require(\"fs\").writeFileSync(\"dist/esm/package.json\", JSON.stringify({name: pkg.name, version: pkg.version, type: \"module\"}))'",
+    "build:cjs": "swc --config-file cjs.swcrc ./src -d dist/cjs --strip-leading-paths --copy-files",
     "build:types": "tsc --project tsconfig.types.json",
     "docs:generate": "tsdoc --src=src/limit-order/* --dest=src/limit-order/README.md && tsdoc --src=src/limit-order-contract/* --dest=src/limit-order-contract/README.md && tsdoc --src=src/limit-order/extensions/** --dest=src/limit-order/extensions/README.md",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -64,6 +64,7 @@
   "devDependencies": {
     "@1inch/eslint-config": "3.0.7",
     "@1inch/tsconfig": "1.0.8",
+    "@swc/cli": "0.7.7",
     "@swc/core": "1.10.7",
     "@swc/jest": "0.2.37",
     "@types/jest": "29.5.14",

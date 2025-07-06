@@ -1,4 +1,4 @@
-import {randBigInt} from './rand-bigint'
+import {randBigInt} from './rand-bigint.js'
 
 describe('randBigint', () => {
     it('should generate rand bigint in correct interval', () => {

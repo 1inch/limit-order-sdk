@@ -1,12 +1,12 @@
-import {LimitOrderWithFee} from './limit-order-with-fee'
-import {FeeTakerExtension} from './extensions/fee-taker/fee-taker.extension'
-import {Fees} from './extensions/fee-taker/fees'
-import {ResolverFee} from './extensions/fee-taker/resolver-fee'
-import {IntegratorFee} from './extensions/fee-taker/integrator-fee'
-import {Interaction} from './interaction'
-import {MakerTraits} from './maker-traits'
-import {Address} from '../address'
-import {Bps} from '../bps'
+import {LimitOrderWithFee} from './limit-order-with-fee.js'
+import {FeeTakerExtension} from './extensions/fee-taker/fee-taker.extension.js'
+import {Fees} from './extensions/fee-taker/fees.js'
+import {ResolverFee} from './extensions/fee-taker/resolver-fee.js'
+import {IntegratorFee} from './extensions/fee-taker/integrator-fee.js'
+import {Interaction} from './interaction.js'
+import {MakerTraits} from './maker-traits.js'
+import {Address} from '../address.js'
+import {Bps} from '../bps.js'
 
 describe('LimitOrderWithFee', () => {
     it('should create fromDataAndExtension', () => {

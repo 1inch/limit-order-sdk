@@ -1,5 +1,5 @@
-import {Interaction} from './interaction'
-import {Address} from '../address'
+import {Interaction} from './interaction.js'
+import {Address} from '../address.js'
 
 describe('Interaction', () => {
     it('should encode/decode', () => {

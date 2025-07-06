@@ -1,6 +1,6 @@
 import {BytesBuilder} from '@1inch/byte-utils'
 import {Address} from 'address'
-import {Whitelist} from './types'
+import {Whitelist} from './types.js'
 
 export class WhitelistHalfAddress implements Whitelist {
     constructor(
