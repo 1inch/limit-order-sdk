@@ -42,4 +42,8 @@ export class Address {
     public isZero(): boolean {
         return this.equal(Address.ZERO_ADDRESS)
     }
+
+    public toBigint(): bigint {
+        return BigInt(this.val)
+    }
 }

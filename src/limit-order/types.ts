@@ -1,5 +1,6 @@
 import {Extension} from './extension'
 import {Address} from '../address'
+import {Uint256} from '../uint256'
 
 export type OrderInfoData = {
     makerAsset: Address
@@ -8,7 +9,7 @@ export type OrderInfoData = {
     takingAmount: bigint
     maker: Address
     salt?: bigint
-    receiver?: Address
+    receiver?: Address | Uint256 // Uint256 for cross chain with non evm chains
 }
 
 export type LimitOrderV4Struct = {

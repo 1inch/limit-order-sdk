@@ -12,6 +12,7 @@ import {MakerTraits} from './maker-traits'
 import {Extension} from './extension'
 import {Address} from '../address'
 import {randBigInt} from '../utils/rand-bigint'
+import {Uint256} from '../uint256'
 
 export class LimitOrder {
     private static readonly Web3Type = `tuple(${[
@@ -29,7 +30,7 @@ export class LimitOrder {
 
     public readonly maker: Address
 
-    public readonly receiver: Address
+    public readonly receiver: Address | Uint256 // Uint256 for cross chain with non evm chains
 
     public readonly makerAsset: Address
 
