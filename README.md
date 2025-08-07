@@ -93,6 +93,115 @@ const signature = await maker.signTypedData(
 )
 ```
 
+### Order filling
+
+To execute a limit order, you need to build the appropriate calldata using the `LimitOrderContract` class. There are different methods depending on whether the order has extensions/interactions and whether the maker is an EOA or smart contract.
+
+```typescript
+import {LimitOrderContract, TakerTraits, LimitOrder} from '@1inch/limit-order-sdk'
+
+// Assume you already have a FusionOrder in `order` variable
+const order = ... // your LimitOrder instance
+const signature = '0x...' // order signature
+const amount = 100_000000n // amount to fill (in taker or maker asset units, based on set `AmountMode`)
+
+// Create taker traits
+const takerTraits = TakerTraits.default()
+    // Optional: Configure taker preferences
+    // .setAmountMode(AmountMode.TakerAmount) // or MakerAmount
+    // .enableNativeUnwrap() // for WETH -> ETH conversion
+    // .setAmountThreshold(minAmount) // minimum/maximum acceptable amount (based on set `AmountMode`)
+
+// Build calldata for different scenarios:
+
+// 1. Simple order fill (no extensions, no interactions)
+const simpleCalldata = LimitOrderContract.getFillOrderCalldata(
+    order.build(), // converts to LimitOrderV4Struct
+    signature,
+    takerTraits,
+    amount
+)
+
+// 2. Fill contract order (when maker is a smart contract)
+const contractCalldata = LimitOrderContract.getFillContractOrderCalldata(
+    order.build(),
+    signature,
+    takerTraits,
+    amount
+)
+
+// 3. Order with extensions or taker interactions
+const extension = '0x...' // extension calldata
+const interaction = '0x...' // taker interaction calldata
+
+const takerTraitsWithArgs = TakerTraits.default()
+    .setExtension(extension)
+    .setInteraction(interaction)
+    // .setReceiver(receiverAddress) // optional: custom receiver
+
+const argsCalldata = LimitOrderContract.getFillOrderArgsCalldata(
+    order.build(),
+    signature,
+    takerTraitsWithArgs,
+    amount
+)
+
+// 4. Contract order with extensions/interactions
+const contractArgsCalldata = LimitOrderContract.getFillContractOrderArgsCalldata(
+    order.build(),
+    signature,
+    takerTraitsWithArgs,
+    amount
+)
+```
+
+The calldata should be sent to the 1inch Limit Order Protocol contract addresses can be found at [docs](https://portal.1inch.dev/documentation/contracts/aggregation-protocol/aggregation-introduction#:~:text=0x111111111117dC0aa78b770fA6A738034120C302-,Aggregation%20Router%20v6,-Name)
+
+#### Taker Traits Configuration
+
+`TakerTraits` allows you to configure various execution parameters:
+
+```typescript
+import {TakerTraits, AmountMode, Address} from '@1inch/limit-order-sdk'
+
+const takerTraits = TakerTraits.default()
+    // Set amount calculation mode
+    .setAmountMode(AmountMode.MakerAmount) // fill by maker amount
+    // or
+    // .setAmountMode(AmountMode.TakerAmount) // fill by taker amount (default)
+
+    // Enable WETH unwrapping to ETH
+    .enableNativeUnwrap()
+
+    // Skip order permit (if not needed)
+    .skipOrderPermit()
+
+    // Enable Permit2
+    .enablePermit2()
+
+    // Set amount threshold
+    .setAmountThreshold(1000000n)
+
+    // Set custom receiver for maker assets
+    .setReceiver(new Address('0x...'))
+
+    // Add extension calldata (for order extensions)
+    .setExtension('0x...')
+
+    // Add taker interaction calldata
+    .setInteraction('0x...')
+```
+
+#### Choosing the Right Fill Method
+
+| Method | Use When |
+|--------|----------|
+| `getFillOrderCalldata` | EOA maker, no extensions/interactions |
+| `getFillContractOrderCalldata` | Smart contract maker, no extensions/interactions |
+| `getFillOrderArgsCalldata` | EOA maker, with extensions/interactions |
+| `getFillContractOrderArgsCalldata` | Smart contract maker, with extensions/interactions |
+
+
 
 ### API
 
