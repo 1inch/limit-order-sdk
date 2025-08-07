@@ -110,7 +110,7 @@ const takerTraits = TakerTraits.default()
     // Optional: Configure taker preferences
     // .setAmountMode(AmountMode.TakerAmount) // or MakerAmount
     // .enableNativeUnwrap() // for WETH -> ETH conversion
-    // .setAmountThreshold(minAmount) // minimum acceptable amount
+    // .setAmountThreshold(minAmount) // minimum/maximum acceptable amount (based on set `AmountMode`)
 
 // Build calldata for different scenarios:
 
@@ -155,8 +155,7 @@ const contractArgsCalldata = LimitOrderContract.getFillContractOrderArgsCalldata
 )
 ```
 
-The calldata should be sent to the 1inch Limit Order Protocol contract
-Contract addresses can be found at [docs](https://portal.1inch.dev/documentation/contracts/aggregation-protocol/aggregation-introduction#:~:text=0x111111111117dC0aa78b770fA6A738034120C302-,Aggregation%20Router%20v6,-Name)
+The calldata should be sent to the 1inch Limit Order Protocol contract addresses can be found at [docs](https://portal.1inch.dev/documentation/contracts/aggregation-protocol/aggregation-introduction#:~:text=0x111111111117dC0aa78b770fA6A738034120C302-,Aggregation%20Router%20v6,-Name)
 
 #### Taker Traits Configuration
 
@@ -169,7 +168,7 @@ const takerTraits = TakerTraits.default()
     // Set amount calculation mode
     .setAmountMode(AmountMode.MakerAmount) // fill by maker amount
     // or
-    .setAmountMode(AmountMode.TakerAmount) // fill by taker amount (default)
+    // .setAmountMode(AmountMode.TakerAmount) // fill by taker amount (default)
 
     // Enable WETH unwrapping to ETH
     .enableNativeUnwrap()
@@ -180,7 +179,7 @@ const takerTraits = TakerTraits.default()
     // Enable Permit2
     .enablePermit2()
 
-    // Set minimum amount threshold
+    // Set amount threshold
     .setAmountThreshold(1000000n)
 
     // Set custom receiver for maker assets
