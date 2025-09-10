@@ -28,7 +28,7 @@ export class LimitOrder {
 
     public readonly maker: Address
 
-    public readonly receiver: Address
+    public receiver: Address
 
     public readonly makerAsset: Address
 
@@ -45,7 +45,14 @@ export class LimitOrder {
     constructor(
         orderInfo: OrderInfoData,
         makerTraits = new MakerTraits(0n),
-        public readonly extension: Extension = Extension.default()
+        public readonly extension: Extension = Extension.default(),
+        config: {optimizeReceiverAddress: boolean} = {
+            /**
+             * When enabled, orders where maker == receiver will have ZERO_ADDRESS set
+             * Used to save calldata costs
+             */
+            optimizeReceiverAddress: true
+        }
     ) {
         assert(
             !orderInfo.takerAsset.isNative(),
@@ -66,9 +73,15 @@ export class LimitOrder {
             extension
         )
         this.maker = orderInfo.maker
-        this.receiver = orderInfo.receiver?.equal(orderInfo.maker)
-            ? Address.ZERO_ADDRESS
-            : orderInfo.receiver || Address.ZERO_ADDRESS
+
+        if (config.optimizeReceiverAddress) {
+            this.receiver = orderInfo.receiver?.equal(orderInfo.maker)
+                ? Address.ZERO_ADDRESS
+                : orderInfo.receiver || Address.ZERO_ADDRESS
+        } else {
+            this.receiver = orderInfo.receiver || orderInfo.maker
+        }
+
         this.makerTraits = makerTraits
 
         assert(this.makingAmount <= UINT_256_MAX, 'makingAmount too big')
@@ -143,7 +156,9 @@ export class LimitOrder {
                 takerAsset: new Address(order.takerAsset),
                 makerAsset: new Address(order.makerAsset)
             },
-            new MakerTraits(BigInt(order.makerTraits))
+            new MakerTraits(BigInt(order.makerTraits)),
+            undefined,
+            {optimizeReceiverAddress: false}
         )
     }
 
@@ -162,7 +177,8 @@ export class LimitOrder {
                 makerAsset: new Address(data.makerAsset)
             },
             new MakerTraits(BigInt(data.makerTraits)),
-            extension
+            extension,
+            {optimizeReceiverAddress: false}
         )
     }
 
