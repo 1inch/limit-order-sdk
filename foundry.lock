@@ -1,0 +1,14 @@
+{
+  "contracts/lib/forge-std": {
+    "rev": "b93cf4bc34ff214c099dc970b153f85ade8c9f66"
+  },
+  "contracts/lib/limit-order-protocol": {
+    "rev": "eff5fc2d77823da0500949de828f14e0af3ede23"
+  },
+  "contracts/lib/openzeppelin-contracts.git": {
+    "rev": "69c8def5f222ff96f2b5beff05dfba996368aa79"
+  },
+  "contracts/lib/solidity-utils": {
+    "rev": "26969f67e5ee32ad70d07ed1c3a8066ed2ede5e1"
+  }
+}
