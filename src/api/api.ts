@@ -90,6 +90,39 @@ export class Api {
     }
 
     /**
+     * Fetch all orders with cursor-based pagination
+     * @param filters - Filter options including pagination via CursorPager
+     * @param sort - Sort key for ordering results
+     */
+    public async getAllOrders(
+        filters?: {
+            pager?: CursorPager
+            /**
+             * 1 - Valid orders,
+             * 2 - Temporarily invalid orders,
+             * 3 - Invalid orders.
+             */
+            statuses?: StatusKey[]
+            takerAsset?: Address
+            makerAsset?: Address
+        },
+        sort?: SortKey
+    ): Promise<CursorPaginatedResponse<LimitOrderApiItem>> {
+        const pager = filters?.pager || new CursorPager()
+
+        const params = {
+            limit: pager.limit.toString(),
+            cursor: pager.cursor,
+            statuses: filters?.statuses?.join(','),
+            makerAsset: filters?.makerAsset?.toString(),
+            takerAsset: filters?.takerAsset?.toString(),
+            sortBy: sort
+        } as Record<string, string | undefined>
+
+        return this.httpClient.get(this.url(`/all`, params), this.headers())
+    }
+
+    /**
      * Get limit order by hash
      *
      * Error will be thrown if order is not found

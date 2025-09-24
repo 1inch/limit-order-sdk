@@ -247,9 +247,26 @@ if (hasMore && nextCursor) {
 }
 
 // Or use without explicit pager (defaults to limit: 100, no cursor)
-const allOrders = await api.getOrdersByMaker(order.maker, {
+const makerOrders = await api.getOrdersByMaker(order.maker, {
     statuses: [1]
 })
+
+// get all orders from orderbook with pagination
+const allOrdersPager = new CursorPager({ limit: 20 })
+const allOrdersResponse = await api.getAllOrders({
+    pager: allOrdersPager,
+    statuses: [1, 2] // valid and temporarily invalid orders
+})
+
+// pagination works the same way
+if (allOrdersResponse.meta.hasMore && allOrdersResponse.meta.nextCursor) {
+    const nextAllOrders = await api.getAllOrders({
+        pager: new CursorPager({ 
+            limit: 20, 
+            cursor: allOrdersResponse.meta.nextCursor 
+        })
+    })
+}
 ```
 
 #### With `axios` as http provider

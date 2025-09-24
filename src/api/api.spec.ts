@@ -208,4 +208,148 @@ describe('Api', () => {
             )
         })
     })
+
+    describe('getAllOrders', () => {
+        const mockResponse: CursorPaginatedResponse<LimitOrderApiItem> = {
+            items: [
+                {
+                    signature:
+                        '0x8602bff28fa0b4909a0bb8e9ba501728db9694dafbc2b83bc5ecdf9976f73b557c90226eae2310c758fb3d10948abac030a02552c51224c6cda60330eaf23a171c',
+                    orderHash:
+                        '0x5aff21a65ca4e9b4d4ba465349aadb272b1fb2e8f44c0b611e924195ae83b267',
+                    createDateTime: '2025-06-13T10:56:38.975Z',
+                    remainingMakerAmount: '99894117',
+                    makerBalance: '10200000',
+                    makerAllowance:
+                        '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+                    data: {
+                        salt: '90536730783456932835645408933940884394045489330979075652578445150989675126720',
+                        maker: '0x091e79334ee3f1c3783ffd208940dcf12c04cbc5',
+                        receiver: '0x0000000000000000000000000000000000000000',
+                        makerAsset:
+                            '0xdac17f958d2ee523a2206206994597c13d831ec7',
+                        takerAsset:
+                            '0x6b175474e89094c44da98b954eedeac495271d0f',
+                        makingAmount: '99894117',
+                        takingAmount: '149696302130000000000',
+                        makerTraits:
+                            '0x440000000000000000000000000000000000684c042000000000000000000000',
+                        extension: '0x'
+                    },
+                    makerRate: '1498549730711.369118964232898720',
+                    takerRate: '0.000000000000667312',
+                    isMakerContract: false,
+                    orderInvalidReason: null
+                }
+            ],
+            meta: {
+                hasMore: true,
+                nextCursor:
+                    'eyJpZCI6IjYzOSIsImNyZWF0ZURhdGVUaW1lIjoiMjAyNS0wNi0xM1QxMDo0OTo1MS4wMDZaIn0=',
+                count: 7
+            }
+        }
+
+        it('should fetch all orders with default parameters', async () => {
+            mockHttpConnector.get.mockResolvedValueOnce(mockResponse)
+
+            const result = await api.getAllOrders()
+
+            expect(mockHttpConnector.get).toHaveBeenCalledWith(
+                'https://api.test.com/1/all?limit=100',
+                {Authorization: 'Bearer test-auth-key'}
+            )
+            expect(result).toEqual(mockResponse)
+        })
+
+        it('should fetch all orders with CursorPager', async () => {
+            mockHttpConnector.get.mockResolvedValueOnce(mockResponse)
+            const pager = new CursorPager({limit: 50, cursor: 'test-cursor'})
+
+            const result = await api.getAllOrders({
+                pager
+            })
+
+            expect(mockHttpConnector.get).toHaveBeenCalledWith(
+                'https://api.test.com/1/all?limit=50&cursor=test-cursor',
+                {Authorization: 'Bearer test-auth-key'}
+            )
+            expect(result).toEqual(mockResponse)
+        })
+
+        it('should fetch all orders with filters', async () => {
+            mockHttpConnector.get.mockResolvedValueOnce(mockResponse)
+            const pager = new CursorPager({limit: 30})
+            const makerAsset = new Address(
+                '0xdac17f958d2ee523a2206206994597c13d831ec7'
+            )
+            const takerAsset = new Address(
+                '0x6b175474e89094c44da98b954eedeac495271d0f'
+            )
+
+            const result = await api.getAllOrders({
+                pager,
+                statuses: [1],
+                makerAsset,
+                takerAsset
+            })
+
+            expect(mockHttpConnector.get).toHaveBeenCalledWith(
+                'https://api.test.com/1/all?limit=30&statuses=1&makerAsset=0xdac17f958d2ee523a2206206994597c13d831ec7&takerAsset=0x6b175474e89094c44da98b954eedeac495271d0f',
+                {Authorization: 'Bearer test-auth-key'}
+            )
+            expect(result).toEqual(mockResponse)
+        })
+
+        it('should fetch all orders with sort parameter', async () => {
+            mockHttpConnector.get.mockResolvedValueOnce(mockResponse)
+            const pager = new CursorPager({limit: 20})
+
+            const result = await api.getAllOrders(
+                {pager, statuses: [1, 2]},
+                'makerRate'
+            )
+
+            expect(mockHttpConnector.get).toHaveBeenCalledWith(
+                'https://api.test.com/1/all?limit=20&statuses=1%2C2&sortBy=makerRate',
+                {Authorization: 'Bearer test-auth-key'}
+            )
+            expect(result).toEqual(mockResponse)
+        })
+
+        it('should handle pagination flow for all orders', async () => {
+            const firstPageResponse = {...mockResponse}
+            const secondPageResponse: CursorPaginatedResponse<LimitOrderApiItem> =
+                {
+                    items: [{...mockResponse.items[0], orderHash: '0xhash2'}],
+                    meta: {
+                        hasMore: false,
+                        nextCursor: undefined,
+                        count: 7
+                    }
+                }
+
+            mockHttpConnector.get
+                .mockResolvedValueOnce(firstPageResponse)
+                .mockResolvedValueOnce(secondPageResponse)
+
+            const firstPage = await api.getAllOrders({
+                pager: new CursorPager({limit: 10})
+            })
+
+            expect(firstPage.meta.hasMore).toBe(true)
+            expect(firstPage.meta.nextCursor).toBeDefined()
+
+            const secondPage = await api.getAllOrders({
+                pager: new CursorPager({
+                    limit: 10,
+                    cursor: firstPage.meta.nextCursor
+                })
+            })
+
+            expect(secondPage.meta.hasMore).toBe(false)
+            expect(secondPage.meta.nextCursor).toBeUndefined()
+            expect(mockHttpConnector.get).toHaveBeenCalledTimes(2)
+        })
+    })
 })
