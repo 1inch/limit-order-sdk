@@ -224,8 +224,32 @@ await api.submitOrder(order, signature)
 const orderHash = order.getOrderHash(networkId)
 const orderInfo = await api.getOrderByHash(orderHash)
 
-// get orders by maker
-const orders = await api.getOrdersByMaker(order.maker)
+// get orders by maker with cursor pagination
+import { CursorPager } from '@1inch/limit-order-sdk'
+
+// First page - no cursor needed
+const firstPager = new CursorPager({ limit: 10 })
+const response = await api.getOrdersByMaker(order.maker, {
+    pager: firstPager,
+    statuses: [1] // only valid orders
+})
+
+const orders = response.items
+const { hasMore, nextCursor, count } = response.meta
+
+// Get next page if available
+if (hasMore && nextCursor) {
+    const nextPager = new CursorPager({ limit: 10, cursor: nextCursor })
+    const nextPage = await api.getOrdersByMaker(order.maker, {
+        pager: nextPager,
+        statuses: [1]
+    })
+}
+
+// Or use without explicit pager (defaults to limit: 100, no cursor)
+const allOrders = await api.getOrdersByMaker(order.maker, {
+    statuses: [1]
+})
 ```
 
 #### With `axios` as http provider

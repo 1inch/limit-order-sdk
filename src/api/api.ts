@@ -3,11 +3,12 @@ import {
     FeeInfoDTO,
     LimitOrderApiItem,
     SortKey,
-    StatusKey
+    StatusKey,
+    CursorPaginatedResponse
 } from './types.js'
 import {DEV_PORTAL_LIMIT_ORDER_BASE_URL} from './constants.js'
 import {Headers, HttpProviderConnector} from './connector/index.js'
-import {Pager} from './pager.js'
+import {CursorPager} from './pager.js'
 import {LimitOrder} from '../limit-order/index.js'
 import {Address} from '../address.js'
 
@@ -51,12 +52,15 @@ export class Api {
     }
 
     /**
-     * Fetch orders created by `maker`
+     * Fetch orders created by `maker` with cursor-based pagination
+     * @param maker - The maker address
+     * @param filters - Filter options including pagination via CursorPager
+     * @param sort - Sort key for ordering results
      */
     public async getOrdersByMaker(
         maker: Address,
         filters?: {
-            pager?: Pager
+            pager?: CursorPager
             /**
              * 1 - Valid orders,
              * 2 - Temporarily invalid orders,
@@ -67,15 +71,17 @@ export class Api {
             makerAsset?: Address
         },
         sort?: SortKey
-    ): Promise<LimitOrderApiItem[]> {
+    ): Promise<CursorPaginatedResponse<LimitOrderApiItem>> {
+        const pager = filters?.pager || new CursorPager()
+
         const params = {
-            limit: filters?.pager?.limit.toString(),
-            page: filters?.pager?.page.toString(),
+            limit: pager.limit.toString(),
+            cursor: pager.cursor,
             statuses: filters?.statuses?.join(','),
             makerAsset: filters?.makerAsset?.toString(),
             takerAsset: filters?.takerAsset?.toString(),
             sortBy: sort
-        } as Record<string, string>
+        } as Record<string, string | undefined>
 
         return this.httpClient.get(
             this.url(`/address/${maker}`, params),
@@ -112,10 +118,15 @@ export class Api {
         )
     }
 
-    private url(path: string, params?: Record<string, string>): string {
+    private url(
+        path: string,
+        params?: Record<string, string | undefined>
+    ): string {
         const query = params
             ? `?${new URLSearchParams(
-                  Object.entries(params).filter(([_, val]) => val !== undefined)
+                  Object.entries(params).filter(
+                      ([_, val]) => val !== undefined
+                  ) as [string, string][]
               )}`
             : ''
 
