@@ -1,7 +1,9 @@
 import {LimitOrder} from './limit-order.js'
 import {ExtensionBuilder} from './extensions/extension-builder.js'
 import {MakerTraits} from './maker-traits.js'
+import {Extension} from './extensions/index.js'
 import {Address} from '../address.js'
+import {ProxyFactory} from '../limit-order-contract/index.js'
 
 describe('Limit Order', () => {
     jest.spyOn(Math, 'random').mockReturnValue(1)
@@ -95,5 +97,126 @@ describe('Limit Order', () => {
         expect(LimitOrder.fromDataAndExtension(order.build(), ext)).toEqual(
             order
         )
+    })
+})
+
+describe('Limit Order Native', () => {
+    jest.spyOn(Math, 'random').mockReturnValue(1)
+    jest.spyOn(Date, 'now').mockReturnValue(1673549418040)
+
+    it('should correct detect that order is from native asset', () => {
+        const ethOrderFactory = new ProxyFactory(
+            Address.fromBigInt(228n),
+            Address.fromBigInt(2n)
+        )
+
+        const maker = new Address('0x00000000219ab540356cbb839cbe05303d7705fa')
+
+        const nativeOrder = LimitOrder.fromNative(
+            1,
+            ethOrderFactory,
+            {
+                takerAsset: new Address(
+                    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+                ),
+                makingAmount: 1000000000000000000n,
+                takingAmount: 1420000000n,
+                maker,
+                salt: 10n
+            },
+            MakerTraits.default().withExtension(),
+            Extension.default()
+        )
+
+        expect(nativeOrder.receiver).toEqual(maker)
+
+        expect(
+            nativeOrder.isNative(
+                1,
+                ethOrderFactory,
+                nativeOrder.nativeSignature(maker)
+            )
+        ).toEqual(true)
+
+        expect(
+            LimitOrder.fromDataAndExtension(
+                nativeOrder.build(),
+                nativeOrder.extension
+            ).isNative(1, ethOrderFactory, nativeOrder.nativeSignature(maker))
+        ).toEqual(true)
+    })
+
+    it('should correct detect that order is from native asset (no salt)', () => {
+        const ethOrderFactory = new ProxyFactory(
+            Address.fromBigInt(228n),
+            Address.fromBigInt(2n)
+        )
+
+        const maker = new Address('0x00000000219ab540356cbb839cbe05303d7705fa')
+
+        const nativeOrder = LimitOrder.fromNative(
+            1,
+            ethOrderFactory,
+            {
+                takerAsset: new Address(
+                    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+                ),
+                makingAmount: 1000000000000000000n,
+                takingAmount: 1420000000n,
+                maker
+            },
+            MakerTraits.default().withExtension(),
+            Extension.default()
+        )
+
+        expect(nativeOrder.receiver).toEqual(maker)
+
+        expect(
+            nativeOrder.isNative(
+                1,
+                ethOrderFactory,
+                nativeOrder.nativeSignature(maker)
+            )
+        ).toEqual(true)
+
+        expect(
+            LimitOrder.fromDataAndExtension(
+                nativeOrder.build(),
+                nativeOrder.extension
+            ).isNative(1, ethOrderFactory, nativeOrder.nativeSignature(maker))
+        ).toEqual(true)
+    })
+
+    it('should correct detect that order is NOT from native asset', () => {
+        const ethOrderFactory = new ProxyFactory(
+            Address.fromBigInt(228n),
+            Address.fromBigInt(2n)
+        )
+
+        const maker = new Address('0x00000000219ab540356cbb839cbe05303d7705fa')
+
+        const order = new LimitOrder({
+            makerAsset: new Address(
+                '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+            ),
+            takerAsset: new Address(
+                '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+            ),
+            makingAmount: 1000000000000000000n,
+            takingAmount: 1420000000n,
+            maker
+        })
+
+        expect(order.receiver).toEqual(Address.ZERO_ADDRESS)
+        expect(
+            order.isNative(1, ethOrderFactory, order.nativeSignature(maker))
+        ).toEqual(false)
+
+        expect(
+            LimitOrder.fromDataAndExtension(
+                order.build(),
+                order.extension
+            ).isNative(1, ethOrderFactory, order.nativeSignature(maker))
+        ).toEqual(false)
     })
 })
