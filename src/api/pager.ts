@@ -1,16 +1,22 @@
 import assert from 'assert'
 import {isInt} from '../validations.js'
 
-export class Pager {
+/**
+ * Cursor-based pagination helper for API requests
+ */
+export class CursorPager {
     public readonly limit: number
 
-    public readonly page: number
+    public readonly cursor?: string
 
-    constructor({limit, page} = {page: 1, limit: 100}) {
+    constructor({limit = 100, cursor}: {limit?: number; cursor?: string} = {}) {
         assert(isInt(limit) && limit > 0, 'Invalid limit')
-        assert(isInt(page) && page > 0, 'Invalid page')
+        assert(
+            cursor === undefined || typeof cursor === 'string',
+            'Invalid cursor'
+        )
 
         this.limit = limit
-        this.page = page
+        this.cursor = cursor
     }
 }

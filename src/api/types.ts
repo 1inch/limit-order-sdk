@@ -42,3 +42,14 @@ export type SortKey =
     | 'makerRate'
     | 'makerAmount'
     | 'takerAmount'
+
+export type CursorPaginationMeta = {
+    hasMore: boolean
+    nextCursor?: string
+    count?: number
+}
+
+export type CursorPaginatedResponse<T> = {
+    items: T[]
+    meta: CursorPaginationMeta
+}
