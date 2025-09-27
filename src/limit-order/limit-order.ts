@@ -13,7 +13,7 @@ import {Extension} from './extensions/extension.js'
 import {injectTrackCode} from './source-track.js'
 import {Address} from '../address.js'
 import {randBigInt} from '../utils/rand-bigint.js'
-import {ProxyFactory} from '../limit-order-contract/index.js'
+import {ProxyFactoryFacade} from '../limit-order-contract/index.js'
 
 export class LimitOrder {
     public static readonly CHAIN_TO_WRAPPER: Record<number, Address> = {
@@ -152,7 +152,7 @@ export class LimitOrder {
 
     static fromNative(
         chainId: number,
-        ethOrdersFactory: ProxyFactory,
+        nativeOrderFactory: ProxyFactoryFacade,
         orderInfo: Omit<OrderInfoData, 'makerAsset'>,
         makerTraits: MakerTraits,
         extension: Extension
@@ -174,7 +174,7 @@ export class LimitOrder {
         const finalOrderInfo: OrderInfoData = {
             ..._orderInfo,
             salt: _order.salt,
-            maker: ethOrdersFactory.getProxyAddress(
+            maker: nativeOrderFactory.getProxyAddress(
                 _order.getOrderHash(chainId)
             )
         }
@@ -186,13 +186,13 @@ export class LimitOrder {
 
     static isNativeOrder(
         chainId: number,
-        ethOrderFactory: ProxyFactory,
+        nativeOrderFactory: ProxyFactoryFacade,
         order: LimitOrderV4Struct,
         signature: string
     ): boolean {
         try {
             const orderWithRealMaker = LimitOrder.fromCalldata(signature)
-            const expectedAddress = ethOrderFactory.getProxyAddress(
+            const expectedAddress = nativeOrderFactory.getProxyAddress(
                 orderWithRealMaker.getOrderHash(chainId)
             )
 
@@ -253,12 +253,12 @@ export class LimitOrder {
 
     public isNative(
         chainId: number,
-        ethOrderFactory: ProxyFactory,
+        nativeOrderFactory: ProxyFactoryFacade,
         signature: string
     ): boolean {
         return LimitOrder.isNativeOrder(
             chainId,
-            ethOrderFactory,
+            nativeOrderFactory,
             this.build(),
             signature
         )
