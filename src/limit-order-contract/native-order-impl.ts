@@ -7,7 +7,7 @@ import {Address} from '../address.js'
 export class NativeOrdersImpl {
     private readonly iface = new Interface(ABI)
 
-    constructor(public address: Address) {}
+    constructor(public readonly address: Address) {}
 
     public cancel(maker: Address, order: LimitOrderV4Struct): CallInfo {
         return {
