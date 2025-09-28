@@ -1,6 +1,6 @@
 import {Interface} from 'ethers'
 import {CallInfo} from './types.js'
-import ABI from '../abi/NativeOrderImpl.abi.json'
+import ABI from '../abi/NativeOrderImpl.abi.json' with {type: 'json'}
 import {LimitOrderV4Struct} from '../limit-order/index.js'
 import {Address} from '../address.js'
 
