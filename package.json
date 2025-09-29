@@ -1,6 +1,6 @@
 {
   "name": "@1inch/limit-order-sdk",
-  "version": "5.2.1",
+  "version": "5.2.2",
   "description": "SDK for 1inch Limit Order Protocol",
   "author": "@1inch",
   "license": "MIT",
