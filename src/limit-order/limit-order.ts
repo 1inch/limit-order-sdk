@@ -13,7 +13,7 @@ import {Extension} from './extensions/extension.js'
 import {injectTrackCode} from './source-track.js'
 import {Address} from '../address.js'
 import {randBigInt} from '../utils/rand-bigint.js'
-import {ProxyFactoryFacade} from '../limit-order-contract/index.js'
+import {ProxyFactory} from '../limit-order-contract/index.js'
 
 export class LimitOrder {
     public static readonly CHAIN_TO_WRAPPER: Record<number, Address> = {
@@ -152,7 +152,7 @@ export class LimitOrder {
 
     static fromNative(
         chainId: number,
-        nativeOrderFactory: ProxyFactoryFacade,
+        nativeOrderFactory: ProxyFactory,
         orderInfo: Omit<OrderInfoData, 'makerAsset'>,
         makerTraits: MakerTraits,
         extension: Extension
@@ -186,7 +186,7 @@ export class LimitOrder {
 
     static isNativeOrder(
         chainId: number,
-        nativeOrderFactory: ProxyFactoryFacade,
+        nativeOrderFactory: ProxyFactory,
         order: LimitOrderV4Struct,
         signature: string
     ): boolean {
@@ -253,7 +253,7 @@ export class LimitOrder {
 
     public isNative(
         chainId: number,
-        nativeOrderFactory: ProxyFactoryFacade,
+        nativeOrderFactory: ProxyFactory,
         signature: string
     ): boolean {
         return LimitOrder.isNativeOrder(

@@ -1,10 +1,9 @@
 import {Address} from './../address.js'
-import {ProxyFactoryFacade} from './proxy-factory-facade.js'
+import {ProxyFactory} from './proxy-factory.js'
 
-describe('ProxyFactoryFacade', () => {
+describe('ProxyFactory', () => {
     it('should correct calc proxy address for Ethereum', () => {
-        const facade = new ProxyFactoryFacade(
-            1,
+        const facade = new ProxyFactory(
             new Address('0x4bc5a9d205adf1091d596bc2e1aa0d6b9dc3b12c'),
             new Address('0xfbc2d33fc6c7fadb155974b847dc04f39010caa9')
         )
@@ -17,9 +16,8 @@ describe('ProxyFactoryFacade', () => {
         )
     })
 
-    it('should correct calc proxy address for zkSync', () => {
-        const facade = new ProxyFactoryFacade(
-            324,
+    it('should correct calc proxy address 2', () => {
+        const facade = new ProxyFactory(
             new Address('0x584aEaB186D81dbB52a8a14820c573480c3d4773'),
             new Address('0xddc60c7babfc55d8030f51910b157e179f7a41fc')
         )
@@ -28,7 +26,7 @@ describe('ProxyFactoryFacade', () => {
 
         const address = facade.getProxyAddress(salt)
         expect(address).toEqual(
-            new Address('0x98f0a945348c031f85164562bff61eb08a0629df')
+            new Address('0xf81af95bb417a82923e5fa001b1e052034026e64')
         )
     })
 })

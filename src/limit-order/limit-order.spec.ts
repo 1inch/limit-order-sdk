@@ -3,7 +3,7 @@ import {ExtensionBuilder} from './extensions/extension-builder.js'
 import {MakerTraits} from './maker-traits.js'
 import {Extension} from './extensions/index.js'
 import {Address} from '../address.js'
-import {ProxyFactoryFacade} from '../limit-order-contract/index.js'
+import {ProxyFactory} from '../limit-order-contract/index.js'
 
 describe('Limit Order', () => {
     jest.spyOn(Math, 'random').mockReturnValue(1)
@@ -105,8 +105,7 @@ describe('Limit Order Native', () => {
     jest.spyOn(Date, 'now').mockReturnValue(1673549418040)
 
     it('should correct detect that order is from native asset', () => {
-        const nativeOrderFactory = new ProxyFactoryFacade(
-            1,
+        const nativeOrderFactory = new ProxyFactory(
             Address.fromBigInt(228n),
             Address.fromBigInt(2n)
         )
@@ -152,8 +151,7 @@ describe('Limit Order Native', () => {
     })
 
     it('should correct detect that order is from native asset (no salt)', () => {
-        const nativeOrderFactory = new ProxyFactoryFacade(
-            1,
+        const nativeOrderFactory = new ProxyFactory(
             Address.fromBigInt(228n),
             Address.fromBigInt(2n)
         )
@@ -198,8 +196,7 @@ describe('Limit Order Native', () => {
     })
 
     it('should correct detect that order is NOT from native asset', () => {
-        const nativeOrderFactory = new ProxyFactoryFacade(
-            1,
+        const nativeOrderFactory = new ProxyFactory(
             Address.fromBigInt(228n),
             Address.fromBigInt(2n)
         )
