@@ -152,7 +152,7 @@ export class LimitOrder {
 
     static fromNative(
         chainId: number,
-        ethOrdersFactory: ProxyFactory,
+        nativeOrderFactory: ProxyFactory,
         orderInfo: Omit<OrderInfoData, 'makerAsset'>,
         makerTraits: MakerTraits,
         extension: Extension
@@ -174,7 +174,7 @@ export class LimitOrder {
         const finalOrderInfo: OrderInfoData = {
             ..._orderInfo,
             salt: _order.salt,
-            maker: ethOrdersFactory.getProxyAddress(
+            maker: nativeOrderFactory.getProxyAddress(
                 _order.getOrderHash(chainId)
             )
         }
@@ -186,13 +186,13 @@ export class LimitOrder {
 
     static isNativeOrder(
         chainId: number,
-        ethOrderFactory: ProxyFactory,
+        nativeOrderFactory: ProxyFactory,
         order: LimitOrderV4Struct,
         signature: string
     ): boolean {
         try {
             const orderWithRealMaker = LimitOrder.fromCalldata(signature)
-            const expectedAddress = ethOrderFactory.getProxyAddress(
+            const expectedAddress = nativeOrderFactory.getProxyAddress(
                 orderWithRealMaker.getOrderHash(chainId)
             )
 
@@ -253,12 +253,12 @@ export class LimitOrder {
 
     public isNative(
         chainId: number,
-        ethOrderFactory: ProxyFactory,
+        nativeOrderFactory: ProxyFactory,
         signature: string
     ): boolean {
         return LimitOrder.isNativeOrder(
             chainId,
-            ethOrderFactory,
+            nativeOrderFactory,
             this.build(),
             signature
         )

@@ -105,7 +105,7 @@ describe('Limit Order Native', () => {
     jest.spyOn(Date, 'now').mockReturnValue(1673549418040)
 
     it('should correct detect that order is from native asset', () => {
-        const ethOrderFactory = new ProxyFactory(
+        const nativeOrderFactory = new ProxyFactory(
             Address.fromBigInt(228n),
             Address.fromBigInt(2n)
         )
@@ -114,7 +114,7 @@ describe('Limit Order Native', () => {
 
         const nativeOrder = LimitOrder.fromNative(
             1,
-            ethOrderFactory,
+            nativeOrderFactory,
             {
                 takerAsset: new Address(
                     '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
@@ -133,7 +133,7 @@ describe('Limit Order Native', () => {
         expect(
             nativeOrder.isNative(
                 1,
-                ethOrderFactory,
+                nativeOrderFactory,
                 nativeOrder.nativeSignature(maker)
             )
         ).toEqual(true)
@@ -142,12 +142,16 @@ describe('Limit Order Native', () => {
             LimitOrder.fromDataAndExtension(
                 nativeOrder.build(),
                 nativeOrder.extension
-            ).isNative(1, ethOrderFactory, nativeOrder.nativeSignature(maker))
+            ).isNative(
+                1,
+                nativeOrderFactory,
+                nativeOrder.nativeSignature(maker)
+            )
         ).toEqual(true)
     })
 
     it('should correct detect that order is from native asset (no salt)', () => {
-        const ethOrderFactory = new ProxyFactory(
+        const nativeOrderFactory = new ProxyFactory(
             Address.fromBigInt(228n),
             Address.fromBigInt(2n)
         )
@@ -156,7 +160,7 @@ describe('Limit Order Native', () => {
 
         const nativeOrder = LimitOrder.fromNative(
             1,
-            ethOrderFactory,
+            nativeOrderFactory,
             {
                 takerAsset: new Address(
                     '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
@@ -174,7 +178,7 @@ describe('Limit Order Native', () => {
         expect(
             nativeOrder.isNative(
                 1,
-                ethOrderFactory,
+                nativeOrderFactory,
                 nativeOrder.nativeSignature(maker)
             )
         ).toEqual(true)
@@ -183,12 +187,16 @@ describe('Limit Order Native', () => {
             LimitOrder.fromDataAndExtension(
                 nativeOrder.build(),
                 nativeOrder.extension
-            ).isNative(1, ethOrderFactory, nativeOrder.nativeSignature(maker))
+            ).isNative(
+                1,
+                nativeOrderFactory,
+                nativeOrder.nativeSignature(maker)
+            )
         ).toEqual(true)
     })
 
     it('should correct detect that order is NOT from native asset', () => {
-        const ethOrderFactory = new ProxyFactory(
+        const nativeOrderFactory = new ProxyFactory(
             Address.fromBigInt(228n),
             Address.fromBigInt(2n)
         )
@@ -209,14 +217,14 @@ describe('Limit Order Native', () => {
 
         expect(order.receiver).toEqual(Address.ZERO_ADDRESS)
         expect(
-            order.isNative(1, ethOrderFactory, order.nativeSignature(maker))
+            order.isNative(1, nativeOrderFactory, order.nativeSignature(maker))
         ).toEqual(false)
 
         expect(
             LimitOrder.fromDataAndExtension(
                 order.build(),
                 order.extension
-            ).isNative(1, ethOrderFactory, order.nativeSignature(maker))
+            ).isNative(1, nativeOrderFactory, order.nativeSignature(maker))
         ).toEqual(false)
     })
 })
