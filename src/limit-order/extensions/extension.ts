@@ -72,6 +72,10 @@ export class Extension {
         return this.makerPermit !== ZX
     }
 
+    get hasPreInteraction(): boolean {
+        return this.preInteraction !== ZX
+    }
+
     static decode(bytes: string): Extension {
         if (bytes === ZX) {
             return Extension.default()
