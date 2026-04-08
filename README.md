@@ -155,8 +155,6 @@ const contractArgsCalldata = LimitOrderContract.getFillContractOrderArgsCalldata
 )
 ```
 
-The calldata should be sent to the 1inch Limit Order Protocol contract addresses can be found at [docs](https://business.1inch.com/portal/documentation/contracts/aggregation-protocol/aggregation-introduction#:~:text=0x111111111117dC0aa78b770fA6A738034120C302-,Aggregation%20Router%20v6,-Name)
-
 #### Taker Traits Configuration
 
 `TakerTraits` allows you to configure various execution parameters:
