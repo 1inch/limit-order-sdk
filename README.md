@@ -25,7 +25,7 @@ const maker = new Wallet(privKey)
 const expiresIn = 120n // 2m
 const expiration = BigInt(Math.floor(Date.now() / 1000)) + expiresIn
 
-const UINT_40_MAX = (1n << 48n) - 1n
+const UINT_40_MAX = (1n << 40n) - 1n
 
 // see MakerTraits.ts
 const makerTraits = MakerTraits.default()
