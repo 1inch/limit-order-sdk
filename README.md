@@ -155,8 +155,6 @@ const contractArgsCalldata = LimitOrderContract.getFillContractOrderArgsCalldata
 )
 ```
 
-The calldata should be sent to the 1inch Limit Order Protocol contract addresses can be found at [docs](https://portal.1inch.dev/documentation/contracts/aggregation-protocol/aggregation-introduction#:~:text=0x111111111117dC0aa78b770fA6A738034120C302-,Aggregation%20Router%20v6,-Name)
-
 #### Taker Traits Configuration
 
 `TakerTraits` allows you to configure various execution parameters:
@@ -211,7 +209,7 @@ import {Api, FetchProviderConnector, LimitOrder, HttpProviderConnector} from '@1
 const networkId = 1 // ethereum
 const api = new Api({
     networkId,
-    authKey: 'key', // get it at https://portal.1inch.dev/
+    authKey: 'key', // get it at https://business.1inch.com/portal/
     httpConnector: new FetchProviderConnector() // or use any connector which implements `HttpProviderConnector`
 })
 
@@ -279,7 +277,7 @@ import {AxiosProviderConnector} from '@1inch/limit-order-sdk/axios'
 
 const api = new Api({
     networkId: 1, // ethereum
-    authKey: 'key', // get it at https://portal.1inch.dev/
+    authKey: 'key', // get it at https://business.1inch.com/portal/
     httpConnector: new AxiosProviderConnector()
 })
 ```
