@@ -29,7 +29,8 @@ export class LimitOrder {
         [324]: new Address('0x5aea5775959fbc2557cc8789bc1bf90a239d9a91'),
         [59144]: new Address('0xe5d7c2a44ffddf6b295a15c148167daaaf5cf34f'),
         [130]: new Address('0x4200000000000000000000000000000000000006'),
-        [146]: new Address('0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38')
+        [146]: new Address('0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38'),
+        [4663]: new Address('0x0bd7d308f8e1639fab988df18a8011f41eacad73')
     }
 
     private static readonly Web3Type = `tuple(${[
