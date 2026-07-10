@@ -28,6 +28,10 @@ export type FeeInfoDTO = {
     whitelistDiscountPercent: number
     protocolFeeReceiver: string
     extensionAddress: string
+    integratorFeeBps?: number
+    integratorFeeReceiver?: string
+    integratorFeeSharePercent?: number
+    source?: string
 }
 
 /**

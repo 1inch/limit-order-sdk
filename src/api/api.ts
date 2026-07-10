@@ -139,13 +139,15 @@ export class Api {
         takerAsset: Address
         makerAmount: bigint
         takerAmount: bigint
+        maker?: Address
     }): Promise<FeeInfoDTO> {
         return this.httpClient.get(
             this.url(`/fee-info`, {
                 makerAsset: params.makerAsset.toString(),
                 takerAsset: params.takerAsset.toString(),
                 makerAmount: params.makerAmount.toString(),
-                takerAmount: params.takerAmount.toString()
+                takerAmount: params.takerAmount.toString(),
+                maker: params.maker?.toString()
             }),
             this.headers()
         )

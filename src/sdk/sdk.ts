@@ -33,8 +33,20 @@ export class Sdk {
             makerAsset: orderInfo.makerAsset,
             takerAsset: orderInfo.takerAsset,
             makerAmount: orderInfo.makingAmount,
-            takerAmount: orderInfo.takingAmount
+            takerAmount: orderInfo.takingAmount,
+            maker: orderInfo.maker
         })
+
+        const integratorFee =
+            extra.integratorFee ??
+            (feeParams.integratorFeeBps && feeParams.integratorFeeReceiver
+                ? new FeeTakerExt.IntegratorFee(
+                      new Address(feeParams.integratorFeeReceiver),
+                      new Address(feeParams.protocolFeeReceiver),
+                      new Bps(BigInt(feeParams.integratorFeeBps)),
+                      Bps.fromPercent(feeParams.integratorFeeSharePercent ?? 0)
+                  )
+                : FeeTakerExt.IntegratorFee.ZERO)
 
         const fees = new FeeTakerExt.Fees(
             new FeeTakerExt.ResolverFee(
@@ -42,7 +54,7 @@ export class Sdk {
                 new Bps(BigInt(feeParams.feeBps)),
                 Bps.fromPercent(feeParams.whitelistDiscountPercent)
             ),
-            extra.integratorFee ?? FeeTakerExt.IntegratorFee.ZERO
+            integratorFee
         )
 
         const feeExt = FeeTakerExt.FeeTakerExtension.new(
@@ -55,7 +67,13 @@ export class Sdk {
             }
         )
 
-        return new LimitOrderWithFee(orderInfo, makerTraits, feeExt)
+        const order = new LimitOrderWithFee(orderInfo, makerTraits, feeExt)
+
+        if (feeParams.source) {
+            order.setSource(feeParams.source)
+        }
+
+        return order
     }
 
     public submitOrder(

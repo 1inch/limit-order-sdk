@@ -19,7 +19,7 @@ export class Bps {
      * @param base what represents 100%
      */
     public static fromPercent(val: number, base = 1n): Bps {
-        return new Bps(BigInt(100 * val) / base)
+        return new Bps(BigInt(Math.round(100 * val)) / base)
     }
 
     /**

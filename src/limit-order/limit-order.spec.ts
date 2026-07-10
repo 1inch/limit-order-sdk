@@ -98,6 +98,28 @@ describe('Limit Order', () => {
             order
         )
     })
+
+    it('should inject and read track code via setSource/getTrackCode', () => {
+        const order = new LimitOrder({
+            makerAsset: new Address(
+                '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+            ),
+            takerAsset: new Address(
+                '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+            ),
+            makingAmount: 1000000000000000000n,
+            takingAmount: 1420000000n,
+            maker: new Address('0x00000000219ab540356cbb839cbe05303d7705fa'),
+            salt: 10n
+        })
+
+        expect(order.getTrackCode()).toBe('0x00000000')
+
+        order.setSource('my-dapp')
+
+        expect(order.getTrackCode()).not.toBe('0x00000000')
+        expect(order.getTrackCode()).toMatch(/^0x[0-9a-f]{8}$/)
+    })
 })
 
 describe('Limit Order Native', () => {
