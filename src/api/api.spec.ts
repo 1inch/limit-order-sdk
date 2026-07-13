@@ -359,10 +359,14 @@ describe('Api', () => {
             feeBps: 30,
             whitelistDiscountPercent: 0,
             protocolFeeReceiver: '0x1111111111111111111111111111111111111111',
-            extensionAddress: '0x2222222222222222222222222222222222222222'
+            extensionAddress: '0x2222222222222222222222222222222222222222',
+            integratorFeeBps: 50,
+            integratorFeeReceiver: '0x3333333333333333333333333333333333333333',
+            integratorFeeSharePercent: 84.45,
+            source: 'abcd1234'
         }
 
-        it('should fetch fee params with maker address', async () => {
+        it('should fetch fee params with makerAddress query param', async () => {
             mockHttpConnector.get.mockResolvedValueOnce(mockFeeInfo)
             const makerAsset = new Address(
                 '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
@@ -374,7 +378,7 @@ describe('Api', () => {
                 '0x1234567890123456789012345678901234567890'
             )
 
-            await api.getFeeParams({
+            const result = await api.getFeeParams({
                 makerAsset,
                 takerAsset,
                 makerAmount: 1000000n,
@@ -383,9 +387,12 @@ describe('Api', () => {
             })
 
             expect(mockHttpConnector.get).toHaveBeenCalledWith(
-                'https://api.test.com/1/fee-info?makerAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&takerAsset=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&makerAmount=1000000&takerAmount=2000000000000000&maker=0x1234567890123456789012345678901234567890',
+                'https://api.test.com/1/fee-info?makerAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&takerAsset=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&makerAmount=1000000&takerAmount=2000000000000000&makerAddress=0x1234567890123456789012345678901234567890',
                 {Authorization: 'Bearer test-auth-key'}
             )
+            expect(result.integratorFeeBps).toBe(50)
+            expect(result.integratorFeeSharePercent).toBe(84.45)
+            expect(result.source).toBe('abcd1234')
         })
     })
 })

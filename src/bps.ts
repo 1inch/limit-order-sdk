@@ -19,7 +19,20 @@ export class Bps {
      * @param base what represents 100%
      */
     public static fromPercent(val: number, base = 1n): Bps {
-        return new Bps(BigInt(Math.round(100 * val)) / base)
+        return Bps.fromSharePercent(val, base)
+    }
+
+    /**
+     * Create BPS from a percent value (0–100) using decimal-safe parsing.
+     * E.g. 84.45% → 8445 bps
+     */
+    public static fromSharePercent(val: number | string, base = 1n): Bps {
+        const normalized = typeof val === 'number' ? val.toString() : val.trim()
+        const [wholePart = '0', fracPart = ''] = normalized.split('.')
+        const fracBps = (fracPart + '00').slice(0, 2)
+        const bps = BigInt(wholePart || '0') * 100n + BigInt(fracBps || '0')
+
+        return new Bps(bps / base)
     }
 
     /**

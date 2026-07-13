@@ -147,7 +147,7 @@ export class Api {
                 takerAsset: params.takerAsset.toString(),
                 makerAmount: params.makerAmount.toString(),
                 takerAmount: params.takerAmount.toString(),
-                maker: params.maker?.toString()
+                makerAddress: params.maker?.toString()
             }),
             this.headers()
         )

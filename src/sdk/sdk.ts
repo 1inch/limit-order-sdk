@@ -1,3 +1,4 @@
+import {buildIntegratorFeeFromFeeInfo} from './integrator-fee.util.js'
 import {Address} from '../address.js'
 import {
     LimitOrderWithFee,
@@ -38,15 +39,7 @@ export class Sdk {
         })
 
         const integratorFee =
-            extra.integratorFee ??
-            (feeParams.integratorFeeBps && feeParams.integratorFeeReceiver
-                ? new FeeTakerExt.IntegratorFee(
-                      new Address(feeParams.integratorFeeReceiver),
-                      new Address(feeParams.protocolFeeReceiver),
-                      new Bps(BigInt(feeParams.integratorFeeBps)),
-                      Bps.fromPercent(feeParams.integratorFeeSharePercent ?? 0)
-                  )
-                : FeeTakerExt.IntegratorFee.ZERO)
+            extra.integratorFee ?? buildIntegratorFeeFromFeeInfo(feeParams)
 
         const fees = new FeeTakerExt.Fees(
             new FeeTakerExt.ResolverFee(
