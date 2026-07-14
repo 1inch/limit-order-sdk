@@ -39,14 +39,14 @@ describe('buildIntegratorFeeFromFeeInfo', () => {
         expect(fee.protocol.toString()).toBe(protocolFeeReceiver)
     })
 
-    it('uses decimal-safe share percent conversion rounded to whole percent', () => {
+    it('builds integrator fee share from whole-number percent', () => {
         const fee = buildIntegratorFeeFromFeeInfo({
             protocolFeeReceiver,
             integratorFeeBps: 7,
             integratorFeeReceiver,
-            integratorFeeSharePercent: 84.45
+            integratorFeeSharePercent: 85
         })
 
-        expect(fee.share.value).toBe(8400n)
+        expect(fee.share.value).toBe(8500n)
     })
 })

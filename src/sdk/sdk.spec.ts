@@ -67,13 +67,13 @@ describe('Sdk.createOrder', () => {
             ...baseFeeInfo,
             integratorFeeBps: 50,
             integratorFeeReceiver,
-            integratorFeeSharePercent: 84.45
+            integratorFeeSharePercent: 85
         })
 
         const order = await sdk.createOrder(orderInfo, MakerTraits.default())
 
         expect(order.feeExtension.fees.integrator.fee.value).toBe(50n)
-        expect(order.feeExtension.fees.integrator.share.value).toBe(8400n)
+        expect(order.feeExtension.fees.integrator.share.value).toBe(8500n)
         expect(order.feeExtension.fees.integrator.integrator.toString()).toBe(
             integratorFeeReceiver
         )

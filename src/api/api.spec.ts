@@ -362,7 +362,7 @@ describe('Api', () => {
             extensionAddress: '0x2222222222222222222222222222222222222222',
             integratorFeeBps: 50,
             integratorFeeReceiver: '0x3333333333333333333333333333333333333333',
-            integratorFeeSharePercent: 84.45,
+            integratorFeeSharePercent: 85,
             source: 'abcd1234'
         }
 
@@ -391,7 +391,7 @@ describe('Api', () => {
                 {Authorization: 'Bearer test-auth-key'}
             )
             expect(result.integratorFeeBps).toBe(50)
-            expect(result.integratorFeeSharePercent).toBe(84.45)
+            expect(result.integratorFeeSharePercent).toBe(85)
             expect(result.source).toBe('abcd1234')
         })
     })

@@ -27,6 +27,6 @@ export function buildIntegratorFeeFromFeeInfo(
         new Address(integratorFeeReceiver),
         new Address(feeParams.protocolFeeReceiver),
         new Bps(BigInt(integratorFeeBps)),
-        Bps.fromSharePercent(Math.round(integratorFeeSharePercent ?? 0))
+        Bps.fromSharePercent(integratorFeeSharePercent ?? 0)
     )
 }

@@ -54,6 +54,15 @@ const signature = await maker.signTypedData(
 await sdk.submitOrder(order, signature)
 ```
 
+### Integrator fee (dev-portal partners)
+
+When the limit-orders API returns integrator fee fields from `/fee-info`, `Sdk.createOrder` automatically:
+
+- embeds `IntegratorFee` from `integratorFeeBps`, `integratorFeeReceiver`, and `integratorFeeSharePercent`
+- sets the salt track code from `source`
+
+`integratorFeeSharePercent` is a whole-number percent (the API rejects fractional `rev-share`). Pass `extra.integratorFee` to override. Integrators without fee config are unaffected — orders keep a zero integrator fee as before.
+
 
 ### RFQ Order creation
 
