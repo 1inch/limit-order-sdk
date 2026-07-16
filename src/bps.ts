@@ -28,6 +28,8 @@ export class Bps {
      */
     public static fromSharePercent(val: number | string, base = 1n): Bps {
         const normalized = typeof val === 'number' ? val.toString() : val.trim()
+        assert(!normalized.startsWith('-'), `invalid bps ${normalized}`)
+
         const [wholePart = '0', fracPart = ''] = normalized.split('.')
         const fracBps = (fracPart + '00').slice(0, 2)
         const bps = BigInt(wholePart || '0') * 100n + BigInt(fracBps || '0')

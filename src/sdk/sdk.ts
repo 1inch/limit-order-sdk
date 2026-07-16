@@ -34,8 +34,7 @@ export class Sdk {
             makerAsset: orderInfo.makerAsset,
             takerAsset: orderInfo.takerAsset,
             makerAmount: orderInfo.makingAmount,
-            takerAmount: orderInfo.takingAmount,
-            maker: orderInfo.maker
+            takerAmount: orderInfo.takingAmount
         })
 
         const integratorFee =

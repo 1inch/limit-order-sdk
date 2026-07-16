@@ -17,5 +17,10 @@ describe('Bps', () => {
         it('should handle zero', () => {
             expect(Bps.fromSharePercent(0).value).toBe(0n)
         })
+
+        it('should preserve negative sign for decimal percent', () => {
+            expect(() => Bps.fromSharePercent(-0.5)).toThrow(/invalid bps/)
+            expect(() => Bps.fromSharePercent(-1.5)).toThrow(/invalid bps/)
+        })
     })
 })
