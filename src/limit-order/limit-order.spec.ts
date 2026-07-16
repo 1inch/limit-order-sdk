@@ -117,8 +117,7 @@ describe('Limit Order', () => {
 
         order.setSource('my-dapp')
 
-        expect(order.getTrackCode()).not.toBe('0x00000000')
-        expect(order.getTrackCode()).toMatch(/^0x[0-9a-f]{8}$/)
+        expect(order.getTrackCode()).toBe('0xaba10994')
     })
 })
 
