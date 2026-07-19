@@ -85,6 +85,20 @@ describe('Sdk.createOrder', () => {
         expect(order.getTrackCode()).toBe('0xdeadbeef')
     })
 
+    it('does not overwrite track code when salt is provided', async () => {
+        mockHttpConnector.get.mockResolvedValue(feeInfoWithIntegrator)
+
+        const seeded = await sdk.createOrder(orderInfo)
+        seeded.setSource('0xdeadbeef')
+
+        const order = await sdk.createOrder({
+            ...orderInfo,
+            salt: seeded.salt
+        })
+
+        expect(order.getTrackCode()).toBe('0xdeadbeef')
+    })
+
     it('uses ZERO integrator fee when fee-info has no integrator fields', async () => {
         mockHttpConnector.get.mockResolvedValueOnce(baseFeeInfo)
 

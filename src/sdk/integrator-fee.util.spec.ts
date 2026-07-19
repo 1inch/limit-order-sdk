@@ -49,4 +49,15 @@ describe('buildIntegratorFeeFromFeeInfo', () => {
 
         expect(fee.share.value).toBe(8500n)
     })
+
+    it('returns ZERO when fee > 0 but share percent is missing', () => {
+        const fee = buildIntegratorFeeFromFeeInfo({
+            protocolFeeReceiver,
+            integratorFeeBps: 50,
+            integratorFeeReceiver,
+            integratorFeeSharePercent: undefined
+        })
+
+        expect(fee).toEqual(FeeTakerExt.IntegratorFee.ZERO)
+    })
 })

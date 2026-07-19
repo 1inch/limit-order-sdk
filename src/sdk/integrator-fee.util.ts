@@ -18,7 +18,8 @@ export function buildIntegratorFeeFromFeeInfo(
     if (
         integratorFeeBps === undefined ||
         integratorFeeBps <= 0 ||
-        !integratorFeeReceiver
+        !integratorFeeReceiver ||
+        integratorFeeSharePercent === undefined
     ) {
         return FeeTakerExt.IntegratorFee.ZERO
     }
@@ -27,6 +28,6 @@ export function buildIntegratorFeeFromFeeInfo(
         new Address(integratorFeeReceiver),
         new Address(feeParams.protocolFeeReceiver),
         new Bps(BigInt(integratorFeeBps)),
-        Bps.fromSharePercent(integratorFeeSharePercent ?? 0)
+        Bps.fromSharePercent(integratorFeeSharePercent)
     )
 }

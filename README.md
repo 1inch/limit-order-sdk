@@ -59,9 +59,13 @@ await sdk.submitOrder(order, signature)
 When the limit-orders API returns integrator fee fields from `/fee-info`, `Sdk.createOrder` automatically:
 
 - embeds `IntegratorFee` from `integratorFeeBps`, `integratorFeeReceiver`, and `integratorFeeSharePercent`
-- sets the salt track code from `source`
+- sets the salt track code from `source` (only when `orderInfo.salt` is omitted)
 
-`integratorFeeSharePercent` is a whole-number percent (the API rejects fractional `rev-share`). Pass `extra.integratorFee` to override. Integrators without fee config are unaffected — orders keep a zero integrator fee as before.
+`integratorFeeSharePercent` is a whole-number percent (the API rejects fractional `rev-share`). If fee bps is set but share is missing, the SDK treats the response as malformed and uses a zero integrator fee. Pass `extra.integratorFee` to override. Integrators without fee config are unaffected — orders keep a zero integrator fee as before.
+
+**Source / track code:** the API returns bare hex (e.g. `aba10994`), not `0x`-prefixed. `setSource` keccak-hashes non-`0x` values into the salt track bits — do not “fix” the API value by adding `0x`, or attribution will break. If you pass an explicit `orderInfo.salt`, the API `source` is not applied; your salt’s track bits win.
+
+**`Bps.fromPercent` / `fromSharePercent`:** values with more than 2 decimal places are truncated to 1 bps precision (e.g. `0.125` → 12 bps) instead of throwing. Negative values are rejected.
 
 
 ### RFQ Order creation
