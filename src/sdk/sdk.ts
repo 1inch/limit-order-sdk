@@ -61,8 +61,8 @@ export class Sdk {
 
         const order = new LimitOrderWithFee(orderInfo, makerTraits, feeExt)
 
-        // Respect caller-provided salt track bits; only apply API source when salt is auto-built
-        if (feeParams.source && orderInfo.salt === undefined) {
+        // Apply API-resolved track code when salt is auto-built
+        if (orderInfo.salt === undefined) {
             order.setSource(feeParams.source)
         }
 

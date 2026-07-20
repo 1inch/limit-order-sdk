@@ -31,7 +31,7 @@ export type FeeInfoDTO = {
     integratorFeeBps?: number
     integratorFeeReceiver?: string
     integratorFeeSharePercent?: number
-    source?: string
+    source: string
 }
 
 /**
