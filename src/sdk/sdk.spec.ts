@@ -35,7 +35,8 @@ describe('Sdk.createOrder', () => {
         feeBps: 30,
         whitelistDiscountPercent: 0,
         protocolFeeReceiver,
-        extensionAddress
+        extensionAddress,
+        source: 'abcd1234'
     }
 
     const feeInfoWithIntegrator: FeeInfoDTO = {
