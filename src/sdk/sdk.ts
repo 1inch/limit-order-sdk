@@ -23,7 +23,7 @@ export class Sdk {
      * Create LimitOrder with an extension params from API
      *
      * @returns LimitOrderWithFee when fees apply, or a plain LimitOrder for a
-     * feeless pair (a zero-fee FeeTaker extension is not encodable) — same as GET /build
+     * feeless pair (a zero-fee extension is not encodable)
      */
     public async createOrder(
         orderInfo: OrderInfoData,
