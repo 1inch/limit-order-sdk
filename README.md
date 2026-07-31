@@ -67,7 +67,7 @@ When the limit-orders API returns integrator fee fields from `/fee-info`, `Sdk.c
 
 **`Bps.fromPercent` / `fromSharePercent`:** values with more than 2 decimal places are truncated to 1 bps precision (e.g. `0.125` → 12 bps) instead of throwing. Negative values are rejected.
 
-**Zero fees:** when `/fee-info` returns `feeBps: 0` the resolver leg is `ResolverFee.ZERO`. If there is no integrator fee either, `createOrder` throws by default, so fee-configured integrators fail fast instead of silently building orders without fees. Orgs with an intentionally zero-fee setup pass `allowFeeless: true` to get a plain `LimitOrder` without the fee extension (a zero-fee extension is not encodable) — same shape as `GET /build` returns for feeless pairs.
+**Zero fees:** when `/fee-info` returns `feeBps: 0` the resolver leg is `ResolverFee.ZERO`. If there is no integrator fee either, `createOrder` throws, so fee-configured integrators fail fast instead of silently building orders without fees. Orgs with an intentionally zero-fee setup use `createOrderWithoutFees` to get a plain `LimitOrder` without the fee extension (a zero-fee extension is not encodable) — same shape as `GET /build` returns for feeless pairs. It refuses to run when the org has fees configured, so it cannot be used to skip them.
 
 
 ### RFQ Order creation

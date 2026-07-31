@@ -156,49 +156,48 @@ describe('Sdk.createOrder', () => {
         protocolFeeReceiver: Address.ZERO_ADDRESS.toString()
     }
 
-    it('rejects a feeless pair unless allowFeeless is set', async () => {
+    it('rejects a feeless pair and points to createOrderWithoutFees', async () => {
         mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
 
         await expect(sdk.createOrder(orderInfo)).rejects.toThrow(
-            'pass allowFeeless: true'
+            'use createOrderWithoutFees()'
         )
     })
 
-    it('builds a plain order for a feeless pair with allowFeeless', async () => {
-        mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
+    describe('createOrderWithoutFees', () => {
+        it('builds a plain order without extension for a feeless pair', async () => {
+            mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
 
-        const order = await sdk.createOrder(orderInfo, MakerTraits.default(), {
-            allowFeeless: true
+            const order = await sdk.createOrderWithoutFees(orderInfo)
+
+            expect(order).not.toBeInstanceOf(LimitOrderWithFee)
+            expect(order.extension.isEmpty()).toBe(true)
+            // track code still applied from fee-info source
+            expect(order.getTrackCode()).toBe('0xb0a1c6b2')
         })
 
-        expect(order).not.toBeInstanceOf(LimitOrderWithFee)
-        expect(order.extension.isEmpty()).toBe(true)
-        // track code still applied from fee-info source
-        expect(order.getTrackCode()).toBe('0xb0a1c6b2')
-    })
+        it('keeps the maker permit', async () => {
+            mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
 
-    it('keeps the maker permit on a feeless plain order', async () => {
-        mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
+            const permit = new Interaction(makerAsset, '0xdeadbeef')
+            const order = await sdk.createOrderWithoutFees(
+                orderInfo,
+                MakerTraits.default(),
+                {makerPermit: permit}
+            )
 
-        const permit = new Interaction(makerAsset, '0xdeadbeef')
-        const order = await sdk.createOrder(orderInfo, MakerTraits.default(), {
-            makerPermit: permit,
-            allowFeeless: true
+            expect(order).not.toBeInstanceOf(LimitOrderWithFee)
+            expect(order.extension.makerPermit).toBe(
+                makerAsset.toString() + 'deadbeef'
+            )
         })
 
-        expect(order).not.toBeInstanceOf(LimitOrderWithFee)
-        expect(order.extension.makerPermit).toBe(
-            makerAsset.toString() + 'deadbeef'
-        )
-    })
+        it('rejects when the org has fees configured', async () => {
+            mockHttpConnector.get.mockResolvedValueOnce(feeInfoWithIntegrator)
 
-    it('still builds a fee order when allowFeeless is set but fees exist', async () => {
-        mockHttpConnector.get.mockResolvedValueOnce(feeInfoWithIntegrator)
-
-        const order = await sdk.createOrder(orderInfo, MakerTraits.default(), {
-            allowFeeless: true
+            await expect(sdk.createOrderWithoutFees(orderInfo)).rejects.toThrow(
+                'use createOrder()'
+            )
         })
-
-        expect(order).toBeInstanceOf(LimitOrderWithFee)
     })
 })

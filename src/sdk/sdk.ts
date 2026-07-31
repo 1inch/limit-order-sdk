@@ -9,7 +9,7 @@ import {
     FeeTakerExt,
     Interaction
 } from '../limit-order/index.js'
-import {Api, ApiConfig} from '../api/index.js'
+import {Api, ApiConfig, FeeInfoDTO} from '../api/index.js'
 import {Bps} from '../bps.js'
 
 export class Sdk {
@@ -23,47 +23,20 @@ export class Sdk {
      * Create LimitOrder with an extension params from API
      *
      * Rejects when the pair has zero fees, so fee-configured integrators fail
-     * fast instead of silently building orders without fees. Pass
-     * `allowFeeless: true` to build a plain LimitOrder (no fee extension) for
-     * an intentionally feeless org - a zero-fee extension is not encodable.
+     * fast instead of silently building orders without fees. Orgs with an
+     * intentionally zero-fee setup should use `createOrderWithoutFees`.
      *
      * @returns LimitOrderWithFee to sign and submit to relayer
      */
-    public async createOrder(
-        orderInfo: OrderInfoData,
-        makerTraits?: MakerTraits,
-        extra?: {
-            makerPermit?: Interaction
-            integratorFee?: FeeTakerExt.IntegratorFee
-            allowFeeless?: false
-        }
-    ): Promise<LimitOrderWithFee>
-
-    public async createOrder(
-        orderInfo: OrderInfoData,
-        makerTraits?: MakerTraits,
-        extra?: {
-            makerPermit?: Interaction
-            integratorFee?: FeeTakerExt.IntegratorFee
-            allowFeeless: true
-        }
-    ): Promise<LimitOrder>
-
     public async createOrder(
         orderInfo: OrderInfoData,
         makerTraits = MakerTraits.default(),
         extra: {
             makerPermit?: Interaction
             integratorFee?: FeeTakerExt.IntegratorFee
-            allowFeeless?: boolean
         } = {}
-    ): Promise<LimitOrder> {
-        const feeParams = await this.api.getFeeParams({
-            makerAsset: orderInfo.makerAsset,
-            takerAsset: orderInfo.takerAsset,
-            makerAmount: orderInfo.makingAmount,
-            takerAmount: orderInfo.takingAmount
-        })
+    ): Promise<LimitOrderWithFee> {
+        const feeParams = await this.getFeeParams(orderInfo)
 
         const integratorFee =
             extra.integratorFee ?? buildIntegratorFeeFromFeeInfo(feeParams)
@@ -78,24 +51,64 @@ export class Sdk {
                   )
                 : FeeTakerExt.ResolverFee.ZERO
 
-        const isFeeless = resolverFee.fee.isZero() && integratorFee.fee.isZero()
-
-        if (isFeeless && !extra.allowFeeless) {
+        if (resolverFee.fee.isZero() && integratorFee.fee.isZero()) {
             throw new Error(
-                'pair has zero fees for this org - pass allowFeeless: true to build a plain LimitOrder without the fee extension'
+                'pair has zero fees for this org - use createOrderWithoutFees() to build a plain order'
             )
         }
 
-        const order = isFeeless
-            ? this.createOrderWithoutFees(orderInfo, makerTraits, extra)
-            : this.createOrderWithFees(
-                  orderInfo,
-                  makerTraits,
-                  new FeeTakerExt.Fees(resolverFee, integratorFee),
-                  feeParams.extensionAddress,
-                  feeParams.whitelist,
-                  extra
-              )
+        const feeExt = FeeTakerExt.FeeTakerExtension.new(
+            new Address(feeParams.extensionAddress),
+            new FeeTakerExt.Fees(resolverFee, integratorFee),
+            Object.values(feeParams.whitelist).map((w) => new Address(w)),
+            {
+                ...extra,
+                customReceiver: orderInfo.receiver
+            }
+        )
+
+        const order = new LimitOrderWithFee(orderInfo, makerTraits, feeExt)
+
+        // Apply API-resolved track code when salt is auto-built
+        if (orderInfo.salt === undefined) {
+            order.setSource(feeParams.source)
+        }
+
+        return order
+    }
+
+    /**
+     * Create a plain LimitOrder (no fee extension) for a pair with zero fees -
+     * a zero-fee extension is not encodable, same shape as GET /build returns.
+     *
+     * Rejects when the org has fees configured, so it cannot be used to skip them.
+     */
+    public async createOrderWithoutFees(
+        orderInfo: OrderInfoData,
+        makerTraits = MakerTraits.default(),
+        extra: {
+            makerPermit?: Interaction
+        } = {}
+    ): Promise<LimitOrder> {
+        const feeParams = await this.getFeeParams(orderInfo)
+        const integratorFee = buildIntegratorFeeFromFeeInfo(feeParams)
+
+        if (feeParams.feeBps > 0 || !integratorFee.fee.isZero()) {
+            throw new Error(
+                'org has fees configured for this pair - use createOrder() so the fees are embedded'
+            )
+        }
+
+        const extension = extra.makerPermit
+            ? new ExtensionBuilder()
+                  .withMakerPermit(
+                      extra.makerPermit.target,
+                      extra.makerPermit.data
+                  )
+                  .build()
+            : undefined
+
+        const order = new LimitOrder(orderInfo, makerTraits, extension)
 
         // Apply API-resolved track code when salt is auto-built
         if (orderInfo.salt === undefined) {
@@ -109,41 +122,12 @@ export class Sdk {
         return this.api.submitOrder(order, signature)
     }
 
-    private createOrderWithFees(
-        orderInfo: OrderInfoData,
-        makerTraits: MakerTraits,
-        fees: FeeTakerExt.Fees,
-        extensionAddress: string,
-        whitelist: Record<string, string>,
-        extra: {makerPermit?: Interaction}
-    ): LimitOrderWithFee {
-        const feeExt = FeeTakerExt.FeeTakerExtension.new(
-            new Address(extensionAddress),
-            fees,
-            Object.values(whitelist).map((w) => new Address(w)),
-            {
-                ...extra,
-                customReceiver: orderInfo.receiver
-            }
-        )
-
-        return new LimitOrderWithFee(orderInfo, makerTraits, feeExt)
-    }
-
-    private createOrderWithoutFees(
-        orderInfo: OrderInfoData,
-        makerTraits: MakerTraits,
-        extra: {makerPermit?: Interaction}
-    ): LimitOrder {
-        const extension = extra.makerPermit
-            ? new ExtensionBuilder()
-                  .withMakerPermit(
-                      extra.makerPermit.target,
-                      extra.makerPermit.data
-                  )
-                  .build()
-            : undefined
-
-        return new LimitOrder(orderInfo, makerTraits, extension)
+    private getFeeParams(orderInfo: OrderInfoData): Promise<FeeInfoDTO> {
+        return this.api.getFeeParams({
+            makerAsset: orderInfo.makerAsset,
+            takerAsset: orderInfo.takerAsset,
+            makerAmount: orderInfo.makingAmount,
+            takerAmount: orderInfo.takingAmount
+        })
     }
 }
