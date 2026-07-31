@@ -4,18 +4,11 @@ import {Bps} from '../bps.js'
 import {
     FeeTakerExt,
     Interaction,
-    LimitOrder,
     LimitOrderWithFee,
     MakerTraits
 } from '../limit-order/index.js'
 import {HttpProviderConnector} from '../api/connector/index.js'
 import {FeeInfoDTO} from '../api/types.js'
-
-function asFeeOrder(order: LimitOrder): LimitOrderWithFee {
-    expect(order).toBeInstanceOf(LimitOrderWithFee)
-
-    return order as LimitOrderWithFee
-}
 
 describe('Sdk.createOrder', () => {
     let mockHttpConnector: jest.Mocked<HttpProviderConnector>
@@ -76,9 +69,7 @@ describe('Sdk.createOrder', () => {
     it('embeds integrator fee from fee-info', async () => {
         mockHttpConnector.get.mockResolvedValueOnce(feeInfoWithIntegrator)
 
-        const order = asFeeOrder(
-            await sdk.createOrder(orderInfo, MakerTraits.default())
-        )
+        const order = await sdk.createOrder(orderInfo, MakerTraits.default())
 
         expect(order.feeExtension.fees.integrator.fee.value).toBe(7n)
         expect(order.feeExtension.fees.integrator.share.value).toBe(8500n)
@@ -117,7 +108,7 @@ describe('Sdk.createOrder', () => {
     it('uses ZERO integrator fee when fee-info has no integrator fields', async () => {
         mockHttpConnector.get.mockResolvedValueOnce(baseFeeInfo)
 
-        const order = asFeeOrder(await sdk.createOrder(orderInfo))
+        const order = await sdk.createOrder(orderInfo)
 
         expect(order.feeExtension.fees.integrator).toEqual(
             FeeTakerExt.IntegratorFee.ZERO
@@ -134,11 +125,9 @@ describe('Sdk.createOrder', () => {
             new Bps(8000n)
         )
 
-        const order = asFeeOrder(
-            await sdk.createOrder(orderInfo, MakerTraits.default(), {
-                integratorFee: customIntegratorFee
-            })
-        )
+        const order = await sdk.createOrder(orderInfo, MakerTraits.default(), {
+            integratorFee: customIntegratorFee
+        })
 
         expect(order.feeExtension.fees.integrator.fee.value).toBe(100n)
         expect(order.feeExtension.fees.integrator.share.value).toBe(8000n)
@@ -152,7 +141,7 @@ describe('Sdk.createOrder', () => {
             whitelistDiscountPercent: 0
         })
 
-        const order = asFeeOrder(await sdk.createOrder(orderInfo))
+        const order = await sdk.createOrder(orderInfo)
 
         expect(order.feeExtension.fees.resolver).toEqual(
             FeeTakerExt.ResolverFee.ZERO
@@ -160,15 +149,27 @@ describe('Sdk.createOrder', () => {
         expect(order.feeExtension.fees.integrator.fee.value).toBe(7n)
     })
 
-    it('builds a plain order without extension for a feeless pair', async () => {
-        mockHttpConnector.get.mockResolvedValueOnce({
-            ...baseFeeInfo,
-            feeBps: 0,
-            whitelistDiscountPercent: 0,
-            protocolFeeReceiver: Address.ZERO_ADDRESS.toString()
-        })
+    const feelessInfo: FeeInfoDTO = {
+        ...baseFeeInfo,
+        feeBps: 0,
+        whitelistDiscountPercent: 0,
+        protocolFeeReceiver: Address.ZERO_ADDRESS.toString()
+    }
 
-        const order = await sdk.createOrder(orderInfo)
+    it('rejects a feeless pair unless allowFeeless is set', async () => {
+        mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
+
+        await expect(sdk.createOrder(orderInfo)).rejects.toThrow(
+            'pass allowFeeless: true'
+        )
+    })
+
+    it('builds a plain order for a feeless pair with allowFeeless', async () => {
+        mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
+
+        const order = await sdk.createOrder(orderInfo, MakerTraits.default(), {
+            allowFeeless: true
+        })
 
         expect(order).not.toBeInstanceOf(LimitOrderWithFee)
         expect(order.extension.isEmpty()).toBe(true)
@@ -177,21 +178,27 @@ describe('Sdk.createOrder', () => {
     })
 
     it('keeps the maker permit on a feeless plain order', async () => {
-        mockHttpConnector.get.mockResolvedValueOnce({
-            ...baseFeeInfo,
-            feeBps: 0,
-            whitelistDiscountPercent: 0,
-            protocolFeeReceiver: Address.ZERO_ADDRESS.toString()
-        })
+        mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
 
         const permit = new Interaction(makerAsset, '0xdeadbeef')
         const order = await sdk.createOrder(orderInfo, MakerTraits.default(), {
-            makerPermit: permit
+            makerPermit: permit,
+            allowFeeless: true
         })
 
         expect(order).not.toBeInstanceOf(LimitOrderWithFee)
         expect(order.extension.makerPermit).toBe(
             makerAsset.toString() + 'deadbeef'
         )
+    })
+
+    it('still builds a fee order when allowFeeless is set but fees exist', async () => {
+        mockHttpConnector.get.mockResolvedValueOnce(feeInfoWithIntegrator)
+
+        const order = await sdk.createOrder(orderInfo, MakerTraits.default(), {
+            allowFeeless: true
+        })
+
+        expect(order).toBeInstanceOf(LimitOrderWithFee)
     })
 })

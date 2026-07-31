@@ -22,15 +22,40 @@ export class Sdk {
     /**
      * Create LimitOrder with an extension params from API
      *
-     * @returns LimitOrderWithFee when fees apply, or a plain LimitOrder for a
-     * feeless pair (a zero-fee extension is not encodable)
+     * Rejects when the pair has zero fees, so fee-configured integrators fail
+     * fast instead of silently building orders without fees. Pass
+     * `allowFeeless: true` to build a plain LimitOrder (no fee extension) for
+     * an intentionally feeless org - a zero-fee extension is not encodable.
+     *
+     * @returns LimitOrderWithFee to sign and submit to relayer
      */
+    public async createOrder(
+        orderInfo: OrderInfoData,
+        makerTraits?: MakerTraits,
+        extra?: {
+            makerPermit?: Interaction
+            integratorFee?: FeeTakerExt.IntegratorFee
+            allowFeeless?: false
+        }
+    ): Promise<LimitOrderWithFee>
+
+    public async createOrder(
+        orderInfo: OrderInfoData,
+        makerTraits?: MakerTraits,
+        extra?: {
+            makerPermit?: Interaction
+            integratorFee?: FeeTakerExt.IntegratorFee
+            allowFeeless: true
+        }
+    ): Promise<LimitOrder>
+
     public async createOrder(
         orderInfo: OrderInfoData,
         makerTraits = MakerTraits.default(),
         extra: {
             makerPermit?: Interaction
             integratorFee?: FeeTakerExt.IntegratorFee
+            allowFeeless?: boolean
         } = {}
     ): Promise<LimitOrder> {
         const feeParams = await this.api.getFeeParams({
@@ -53,17 +78,24 @@ export class Sdk {
                   )
                 : FeeTakerExt.ResolverFee.ZERO
 
-        const order =
-            resolverFee.fee.isZero() && integratorFee.fee.isZero()
-                ? this.createOrderWithoutFees(orderInfo, makerTraits, extra)
-                : this.createOrderWithFees(
-                      orderInfo,
-                      makerTraits,
-                      new FeeTakerExt.Fees(resolverFee, integratorFee),
-                      feeParams.extensionAddress,
-                      feeParams.whitelist,
-                      extra
-                  )
+        const isFeeless = resolverFee.fee.isZero() && integratorFee.fee.isZero()
+
+        if (isFeeless && !extra.allowFeeless) {
+            throw new Error(
+                'pair has zero fees for this org - pass allowFeeless: true to build a plain LimitOrder without the fee extension'
+            )
+        }
+
+        const order = isFeeless
+            ? this.createOrderWithoutFees(orderInfo, makerTraits, extra)
+            : this.createOrderWithFees(
+                  orderInfo,
+                  makerTraits,
+                  new FeeTakerExt.Fees(resolverFee, integratorFee),
+                  feeParams.extensionAddress,
+                  feeParams.whitelist,
+                  extra
+              )
 
         // Apply API-resolved track code when salt is auto-built
         if (orderInfo.salt === undefined) {
