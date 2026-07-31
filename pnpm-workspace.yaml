@@ -1,0 +1,5 @@
+auditConfig:
+  # brace-expansion DoS (patched only in 5.0.8, forced via package.json overrides);
+  # the minimatch-pinned 1.x/2.x copies have no backported fix yet - drop once backports ship
+  ignoreGhsas:
+    - GHSA-mh99-v99m-4gvg

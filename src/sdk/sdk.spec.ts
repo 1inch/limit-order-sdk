@@ -1,7 +1,12 @@
 import {Sdk} from './sdk.js'
 import {Address} from '../address.js'
 import {Bps} from '../bps.js'
-import {FeeTakerExt, MakerTraits} from '../limit-order/index.js'
+import {
+    FeeTakerExt,
+    Interaction,
+    LimitOrderWithFee,
+    MakerTraits
+} from '../limit-order/index.js'
 import {HttpProviderConnector} from '../api/connector/index.js'
 import {FeeInfoDTO} from '../api/types.js'
 
@@ -126,5 +131,73 @@ describe('Sdk.createOrder', () => {
 
         expect(order.feeExtension.fees.integrator.fee.value).toBe(100n)
         expect(order.feeExtension.fees.integrator.share.value).toBe(8000n)
+    })
+
+    it('uses ResolverFee.ZERO for integrator-only fee-info (feeBps 0)', async () => {
+        // integrator-only: feeBps 0 but protocolFeeReceiver stays set
+        mockHttpConnector.get.mockResolvedValueOnce({
+            ...feeInfoWithIntegrator,
+            feeBps: 0,
+            whitelistDiscountPercent: 0
+        })
+
+        const order = await sdk.createOrder(orderInfo)
+
+        expect(order.feeExtension.fees.resolver).toEqual(
+            FeeTakerExt.ResolverFee.ZERO
+        )
+        expect(order.feeExtension.fees.integrator.fee.value).toBe(7n)
+    })
+
+    const feelessInfo: FeeInfoDTO = {
+        ...baseFeeInfo,
+        feeBps: 0,
+        whitelistDiscountPercent: 0,
+        protocolFeeReceiver: Address.ZERO_ADDRESS.toString()
+    }
+
+    it('rejects a feeless pair and points to createOrderWithoutFees', async () => {
+        mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
+
+        await expect(sdk.createOrder(orderInfo)).rejects.toThrow(
+            'use createOrderWithoutFees()'
+        )
+    })
+
+    describe('createOrderWithoutFees', () => {
+        it('builds a plain order without extension for a feeless pair', async () => {
+            mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
+
+            const order = await sdk.createOrderWithoutFees(orderInfo)
+
+            expect(order).not.toBeInstanceOf(LimitOrderWithFee)
+            expect(order.extension.isEmpty()).toBe(true)
+            // track code still applied from fee-info source
+            expect(order.getTrackCode()).toBe('0xb0a1c6b2')
+        })
+
+        it('keeps the maker permit', async () => {
+            mockHttpConnector.get.mockResolvedValueOnce(feelessInfo)
+
+            const permit = new Interaction(makerAsset, '0xdeadbeef')
+            const order = await sdk.createOrderWithoutFees(
+                orderInfo,
+                MakerTraits.default(),
+                {makerPermit: permit}
+            )
+
+            expect(order).not.toBeInstanceOf(LimitOrderWithFee)
+            expect(order.extension.makerPermit).toBe(
+                makerAsset.toString() + 'deadbeef'
+            )
+        })
+
+        it('rejects when the org has fees configured', async () => {
+            mockHttpConnector.get.mockResolvedValueOnce(feeInfoWithIntegrator)
+
+            await expect(sdk.createOrderWithoutFees(orderInfo)).rejects.toThrow(
+                'use createOrder()'
+            )
+        })
     })
 })
