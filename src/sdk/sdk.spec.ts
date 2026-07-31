@@ -1,9 +1,21 @@
 import {Sdk} from './sdk.js'
 import {Address} from '../address.js'
 import {Bps} from '../bps.js'
-import {FeeTakerExt, MakerTraits} from '../limit-order/index.js'
+import {
+    FeeTakerExt,
+    Interaction,
+    LimitOrder,
+    LimitOrderWithFee,
+    MakerTraits
+} from '../limit-order/index.js'
 import {HttpProviderConnector} from '../api/connector/index.js'
 import {FeeInfoDTO} from '../api/types.js'
+
+function asFeeOrder(order: LimitOrder): LimitOrderWithFee {
+    expect(order).toBeInstanceOf(LimitOrderWithFee)
+
+    return order as LimitOrderWithFee
+}
 
 describe('Sdk.createOrder', () => {
     let mockHttpConnector: jest.Mocked<HttpProviderConnector>
@@ -64,7 +76,9 @@ describe('Sdk.createOrder', () => {
     it('embeds integrator fee from fee-info', async () => {
         mockHttpConnector.get.mockResolvedValueOnce(feeInfoWithIntegrator)
 
-        const order = await sdk.createOrder(orderInfo, MakerTraits.default())
+        const order = asFeeOrder(
+            await sdk.createOrder(orderInfo, MakerTraits.default())
+        )
 
         expect(order.feeExtension.fees.integrator.fee.value).toBe(7n)
         expect(order.feeExtension.fees.integrator.share.value).toBe(8500n)
@@ -103,7 +117,7 @@ describe('Sdk.createOrder', () => {
     it('uses ZERO integrator fee when fee-info has no integrator fields', async () => {
         mockHttpConnector.get.mockResolvedValueOnce(baseFeeInfo)
 
-        const order = await sdk.createOrder(orderInfo)
+        const order = asFeeOrder(await sdk.createOrder(orderInfo))
 
         expect(order.feeExtension.fees.integrator).toEqual(
             FeeTakerExt.IntegratorFee.ZERO
@@ -120,11 +134,64 @@ describe('Sdk.createOrder', () => {
             new Bps(8000n)
         )
 
-        const order = await sdk.createOrder(orderInfo, MakerTraits.default(), {
-            integratorFee: customIntegratorFee
-        })
+        const order = asFeeOrder(
+            await sdk.createOrder(orderInfo, MakerTraits.default(), {
+                integratorFee: customIntegratorFee
+            })
+        )
 
         expect(order.feeExtension.fees.integrator.fee.value).toBe(100n)
         expect(order.feeExtension.fees.integrator.share.value).toBe(8000n)
+    })
+
+    it('uses ResolverFee.ZERO for integrator-only fee-info (feeBps 0)', async () => {
+        // integrator-only: feeBps 0 but protocolFeeReceiver stays set
+        mockHttpConnector.get.mockResolvedValueOnce({
+            ...feeInfoWithIntegrator,
+            feeBps: 0,
+            whitelistDiscountPercent: 0
+        })
+
+        const order = asFeeOrder(await sdk.createOrder(orderInfo))
+
+        expect(order.feeExtension.fees.resolver).toEqual(
+            FeeTakerExt.ResolverFee.ZERO
+        )
+        expect(order.feeExtension.fees.integrator.fee.value).toBe(7n)
+    })
+
+    it('builds a plain order without extension for a feeless pair', async () => {
+        mockHttpConnector.get.mockResolvedValueOnce({
+            ...baseFeeInfo,
+            feeBps: 0,
+            whitelistDiscountPercent: 0,
+            protocolFeeReceiver: Address.ZERO_ADDRESS.toString()
+        })
+
+        const order = await sdk.createOrder(orderInfo)
+
+        expect(order).not.toBeInstanceOf(LimitOrderWithFee)
+        expect(order.extension.isEmpty()).toBe(true)
+        // track code still applied from fee-info source
+        expect(order.getTrackCode()).toBe('0xb0a1c6b2')
+    })
+
+    it('keeps the maker permit on a feeless plain order', async () => {
+        mockHttpConnector.get.mockResolvedValueOnce({
+            ...baseFeeInfo,
+            feeBps: 0,
+            whitelistDiscountPercent: 0,
+            protocolFeeReceiver: Address.ZERO_ADDRESS.toString()
+        })
+
+        const permit = new Interaction(makerAsset, '0xdeadbeef')
+        const order = await sdk.createOrder(orderInfo, MakerTraits.default(), {
+            makerPermit: permit
+        })
+
+        expect(order).not.toBeInstanceOf(LimitOrderWithFee)
+        expect(order.extension.makerPermit).toBe(
+            makerAsset.toString() + 'deadbeef'
+        )
     })
 })

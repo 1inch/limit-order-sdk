@@ -67,6 +67,8 @@ When the limit-orders API returns integrator fee fields from `/fee-info`, `Sdk.c
 
 **`Bps.fromPercent` / `fromSharePercent`:** values with more than 2 decimal places are truncated to 1 bps precision (e.g. `0.125` → 12 bps) instead of throwing. Negative values are rejected.
 
+**Zero fees:** when `/fee-info` returns `feeBps: 0` the resolver leg is `ResolverFee.ZERO`; if there is no integrator fee either, `createOrder` returns a plain `LimitOrder` without the fee extension (a zero-fee extension is not encodable) — matching what `GET /build` produces. Check `order instanceof LimitOrderWithFee` when you need the fee fields.
+
 
 ### RFQ Order creation
 
