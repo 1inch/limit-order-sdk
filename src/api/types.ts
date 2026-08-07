@@ -41,7 +41,11 @@ export type FeeInfoDTO = {
  */
 export type StatusKey = 1 | 2 | 3
 export type SortKey =
-    'createDateTime' | 'takerRate' | 'makerRate' | 'makerAmount' | 'takerAmount'
+    | 'createDateTime'
+    | 'takerRate'
+    | 'makerRate'
+    | 'makerAmount'
+    | 'takerAmount'
 
 export type CursorPaginationMeta = {
     hasMore: boolean
