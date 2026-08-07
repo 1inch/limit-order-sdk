@@ -28,3 +28,7 @@ export function injectTrackCode(salt: bigint, source?: string): bigint {
 
     return new BN(salt).setMask(TRACK_CODE_MASK, track).value
 }
+
+export function extractTrackCode(salt: bigint): string {
+    return new BN(salt).getMask(TRACK_CODE_MASK).toHex(8)
+}

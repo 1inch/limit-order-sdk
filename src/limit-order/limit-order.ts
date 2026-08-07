@@ -10,7 +10,7 @@ import {
 import {LimitOrderV4Struct, OrderInfoData} from './types.js'
 import {MakerTraits} from './maker-traits.js'
 import {Extension} from './extensions/extension.js'
-import {injectTrackCode} from './source-track.js'
+import {extractTrackCode, injectTrackCode} from './source-track.js'
 import {Address} from '../address.js'
 import {randBigInt} from '../utils/rand-bigint.js'
 import {ProxyFactory} from '../limit-order-contract/index.js'
@@ -300,6 +300,13 @@ export class LimitOrder {
         this._salt = injectTrackCode(this.salt, source)
 
         return this
+    }
+
+    /**
+     * Returns 4-byte track code from order `salt` [224, 255] bits as 0x-prefixed hex
+     */
+    public getTrackCode(): string {
+        return extractTrackCode(this.salt)
     }
 
     public toCalldata(): string {

@@ -1,3 +1,4 @@
+import {buildIntegratorFeeFromFeeInfo} from './integrator-fee.util.js'
 import {Address} from '../address.js'
 import {
     LimitOrderWithFee,
@@ -36,13 +37,16 @@ export class Sdk {
             takerAmount: orderInfo.takingAmount
         })
 
+        const integratorFee =
+            extra.integratorFee ?? buildIntegratorFeeFromFeeInfo(feeParams)
+
         const fees = new FeeTakerExt.Fees(
             new FeeTakerExt.ResolverFee(
                 new Address(feeParams.protocolFeeReceiver),
                 new Bps(BigInt(feeParams.feeBps)),
                 Bps.fromPercent(feeParams.whitelistDiscountPercent)
             ),
-            extra.integratorFee ?? FeeTakerExt.IntegratorFee.ZERO
+            integratorFee
         )
 
         const feeExt = FeeTakerExt.FeeTakerExtension.new(
@@ -55,7 +59,14 @@ export class Sdk {
             }
         )
 
-        return new LimitOrderWithFee(orderInfo, makerTraits, feeExt)
+        const order = new LimitOrderWithFee(orderInfo, makerTraits, feeExt)
+
+        // Apply API-resolved track code when salt is auto-built
+        if (orderInfo.salt === undefined) {
+            order.setSource(feeParams.source)
+        }
+
+        return order
     }
 
     public submitOrder(

@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - name: Install Dependencies
@@ -33,5 +33,7 @@ jobs:
       - name: Unit tests
         run: pnpm test
 
+      # pnpm 10 uses the retired legacy audit endpoint, run the audit via pnpm 11 client
+      # (no --config.minimumReleaseAge flag: pnpm 10.6.1 dlx does not support it)
       - name: Security
-        run: pnpm audit
+        run: pnpm dlx pnpm@11.0.0-rc.1 --config.manage-package-manager-versions=false audit --audit-level high
