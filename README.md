@@ -15,6 +15,7 @@ npm install '@1inch/limit-order-sdk'
 ### Order creation
 ```typescript
 import {LimitOrder, MakerTraits, Address, Sdk, randBigInt, FetchProviderConnector} from "@1inch/limit-order-sdk"
+import {UINT_40_MAX} from "@1inch/byte-utils"
 import {Wallet} from 'ethers'
 
 // it is a well-known test private key, do not use it in production
@@ -24,8 +25,6 @@ const authKey = '...'
 const maker = new Wallet(privKey)
 const expiresIn = 120n // 2m
 const expiration = BigInt(Math.floor(Date.now() / 1000)) + expiresIn
-
-const UINT_40_MAX = (1n << 40n) - 1n
 
 // see MakerTraits.ts
 const makerTraits = MakerTraits.default()
@@ -73,8 +72,8 @@ By default a limit order can be filled in several parts. To create an order that
 
 ```typescript
 import {MakerTraits, randBigInt} from "@1inch/limit-order-sdk"
+import {UINT_40_MAX} from "@1inch/byte-utils"
 
-const UINT_40_MAX = (1n << 40n) - 1n
 const expiration = BigInt(Math.floor(Date.now() / 1000)) + 3600n // 1h
 
 const makerTraits = MakerTraits.default()
@@ -89,7 +88,7 @@ const makerTraits = MakerTraits.default()
 Rules:
 
 - Give every such order its own random nonce via `withNonce` - never reuse a nonce across active orders.
-- Do not combine this mode with `withEpoch` / `enableEpochManagerCheck` - such orders are rejected on submit.
+- Do not call `withEpoch` on these orders - submit rejects fill-or-kill orders that use epoch.
 - If the order cannot be filled in full right away, it stays open until it fills, expires or is cancelled. It will never be filled partially.
 
 The orderbook API returns `partialFillsAllowed: false` for these orders.
@@ -99,22 +98,30 @@ The orderbook API returns `partialFillsAllowed: false` for these orders.
 Cancellation is on-chain, using the maker traits and the hash of the order (keep both after submitting):
 
 ```typescript
+import {getLimitOrderContract} from "@1inch/limit-order-sdk"
 import {Contract, JsonRpcProvider, Wallet} from "ethers"
 
-const LOP_V4 = '0x111111125421ca6dc452d289314280a0f8842a65'
+const chainId = 1 // same chainId as create/submit
 const abi = [
     'function cancelOrder(uint256 makerTraits, bytes32 orderHash)',
     'function cancelOrders(uint256[] makerTraits, bytes32[] orderHashes)'
 ]
 
 const signer = new Wallet(privKey, new JsonRpcProvider(rpcUrl))
-const lop = new Contract(LOP_V4, abi, signer)
+const lop = new Contract(getLimitOrderContract(chainId), abi, signer)
+
+// keep after submit
+const traits = order.build().makerTraits // string
+const orderHash = order.getOrderHash(chainId)
 
 // single order
-await (await lop.cancelOrder(order.build().makerTraits, orderHash)).wait()
+await (await lop.cancelOrder(BigInt(traits), orderHash)).wait()
 
 // several orders in one transaction (traits[i] must belong to hashes[i])
-await (await lop.cancelOrders(traitsArray, hashesArray)).wait()
+await (await lop.cancelOrders(
+    openOrders.map((o) => BigInt(o.build().makerTraits)),
+    openOrders.map((o) => o.getOrderHash(chainId))
+)).wait()
 ```
 
 Note: cancelling all orders by epoch (`increaseEpoch`) does not affect orders with partial fills disabled - cancel them by hash as shown above.
