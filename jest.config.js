@@ -5,7 +5,12 @@ module.exports = {
     transform: {
         '^.+\\.(t|j)s$': '@swc/jest'
     },
-    collectCoverageFrom: ['**/*.(t|j)s'],
+    collectCoverageFrom: [
+        '**/*.(t|j)s',
+        '!**/*.spec.ts',
+        '!**/*.test.ts',
+        '!**/index.ts'
+    ],
     coverageDirectory: '../coverage',
     testEnvironment: 'node',
     moduleNameMapper: {

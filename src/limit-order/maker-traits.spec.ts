@@ -134,4 +134,52 @@ describe('MakerTraits', () => {
             '5f800000000000ffffffffffffffffffffffffffffffffffffffffffffffffff'
         )
     })
+
+    test('any sender clears allowed sender', () => {
+        const traits = MakerTraits.default()
+            .withAllowedSender(Address.fromBigInt(1337n))
+            .withAnySender()
+
+        expect(traits.isPrivate()).toEqual(false)
+        expect(traits.allowedSender()).toEqual('0'.repeat(20))
+    })
+
+    test('zero expiration is treated as no expiration', () => {
+        const traits = MakerTraits.default().withExpiration(0n)
+
+        expect(traits.expiration()).toEqual(null)
+        expect(
+            MakerTraits.default()
+                .withExpiration(null as unknown as bigint)
+                .expiration()
+        ).toEqual(null)
+    })
+
+    test('partial and multiple fill setters', () => {
+        const traits = MakerTraits.default()
+            .setPartialFills(false)
+            .setMultipleFills(true)
+
+        expect(traits.isPartialFillAllowed()).toEqual(false)
+        expect(traits.isMultipleFillsAllowed()).toEqual(true)
+
+        traits.setPartialFills(true).setMultipleFills(false)
+        expect(traits.isPartialFillAllowed()).toEqual(true)
+        expect(traits.isMultipleFillsAllowed()).toEqual(false)
+        expect(traits.isBitInvalidatorMode()).toEqual(true)
+    })
+
+    test('bit invalidator is off when both fill modes are allowed', () => {
+        const traits = MakerTraits.default()
+            .allowPartialFills()
+            .allowMultipleFills()
+
+        expect(traits.isBitInvalidatorMode()).toEqual(false)
+    })
+
+    test('epoch manager requires both fill modes', () => {
+        expect(() => MakerTraits.default().withEpoch(1n, 1n)).toThrow(
+            /Epoch manager allowed only/
+        )
+    })
 })

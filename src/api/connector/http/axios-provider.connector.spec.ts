@@ -1,5 +1,6 @@
-import axios from 'axios'
+import axios, {AxiosError} from 'axios'
 import {AxiosProviderConnector} from './axios-provider.connector.js'
+import {AuthError} from '../../errors.js'
 
 describe('Axios Http provider connector', () => {
     let httpConnector: AxiosProviderConnector
@@ -41,5 +42,44 @@ describe('Axios Http provider connector', () => {
         expect(axios.post).toHaveBeenCalledWith(url, body, {
             headers: {Authorization: 'Bearer test-key'}
         })
+    })
+
+    it('should map get 401 to AuthError', async () => {
+        const error = new AxiosError('unauth')
+        error.response = {status: 401} as AxiosError['response']
+        jest.spyOn(axios, 'get').mockRejectedValueOnce(error)
+
+        await expect(
+            httpConnector.get('https://123.com', {})
+        ).rejects.toBeInstanceOf(AuthError)
+    })
+
+    it('should rethrow non-401 get errors', async () => {
+        const error = new Error('network')
+        jest.spyOn(axios, 'get').mockRejectedValueOnce(error)
+
+        await expect(httpConnector.get('https://123.com', {})).rejects.toThrow(
+            'network'
+        )
+    })
+
+    it('should map post 401 to AuthError', async () => {
+        const error = new AxiosError('unauth')
+        error.response = {status: 401} as AxiosError['response']
+        jest.spyOn(axios, 'post').mockRejectedValueOnce(error)
+
+        await expect(
+            httpConnector.post('https://123.com', {}, {})
+        ).rejects.toBeInstanceOf(AuthError)
+    })
+
+    it('should rethrow non-401 post errors', async () => {
+        const error = new AxiosError('server')
+        error.response = {status: 500} as AxiosError['response']
+        jest.spyOn(axios, 'post').mockRejectedValueOnce(error)
+
+        await expect(
+            httpConnector.post('https://123.com', {}, {})
+        ).rejects.toBe(error)
     })
 })

@@ -28,4 +28,26 @@ describe('FeeCalculator', () => {
 
         expect(protocolFee).toBe(7377n)
     })
+
+    it('should calculate making amount and protocol share of integrator fee', () => {
+        const calculator = new FeeCalculator(
+            Fees.integratorFee(
+                new IntegratorFee(
+                    new Address('0x8e097e5e0493de033270a01b324caf31f464dc67'),
+                    new Address('0x90cbe4bdd538d6e9b379bff5fe72c3d67a521de5'),
+                    new Bps(10n),
+                    new Bps(6000n)
+                )
+            ),
+            WhitelistHalfAddress.new([Address.fromBigInt(1n)])
+        )
+        const taker = Address.ZERO_ADDRESS
+
+        expect(calculator.getMakingAmount(taker, 10_000_000n)).toBeGreaterThan(
+            0n
+        )
+        expect(
+            calculator.getProtocolShareOfIntegratorFee(taker, 18_442_227n)
+        ).toBeGreaterThan(0n)
+    })
 })
