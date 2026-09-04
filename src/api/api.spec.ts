@@ -2,7 +2,9 @@ import {Api} from './api.js'
 import {HttpProviderConnector} from './connector/index.js'
 import {CursorPager} from './pager.js'
 import {CursorPaginatedResponse, LimitOrderApiItem} from './types.js'
+import {DEV_PORTAL_LIMIT_ORDER_BASE_URL} from './constants.js'
 import {Address} from '../address.js'
+import {LimitOrder} from '../limit-order/limit-order.js'
 
 describe('Api', () => {
     let api: Api
@@ -389,6 +391,92 @@ describe('Api', () => {
             expect(result.integratorFeeBps).toBe(50)
             expect(result.integratorFeeSharePercent).toBe(85)
             expect(result.source).toBe('abcd1234')
+        })
+    })
+
+    describe('submitOrder and getOrderByHash', () => {
+        const maker = new Address('0x1234567890123456789012345678901234567890')
+
+        it('should submit an order hash and signature', async () => {
+            const order = new LimitOrder({
+                makerAsset: new Address(
+                    '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+                ),
+                takerAsset: new Address(
+                    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+                ),
+                makingAmount: 1n,
+                takingAmount: 1n,
+                maker,
+                salt: 10n
+            })
+            mockHttpConnector.post.mockResolvedValueOnce(undefined)
+
+            await api.submitOrder(order, '0xsignature')
+
+            expect(mockHttpConnector.post).toHaveBeenCalledWith(
+                'https://api.test.com/1/',
+                {
+                    orderHash: order.getOrderHash(1),
+                    signature: '0xsignature',
+                    data: {
+                        ...order.build(),
+                        extension: order.extension.encode()
+                    }
+                },
+                {Authorization: 'Bearer test-auth-key'}
+            )
+        })
+
+        it('should fetch an order by hash', async () => {
+            const item = {
+                signature: '0xsignature',
+                orderHash: '0xhash',
+                createDateTime: '2023-10-19T14:03:27.500Z',
+                remainingMakerAmount: '1',
+                makerBalance: '1',
+                makerAllowance: '1',
+                data: {
+                    salt: '10',
+                    maker: maker.toString(),
+                    receiver: '0x0000000000000000000000000000000000000000',
+                    makerAsset: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                    takerAsset: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+                    makingAmount: '1',
+                    takingAmount: '1',
+                    makerTraits: '0',
+                    extension: '0x'
+                },
+                makerRate: '1',
+                takerRate: '1',
+                isMakerContract: false,
+                orderInvalidReason: null
+            }
+            mockHttpConnector.get.mockResolvedValueOnce(item)
+
+            const result = await api.getOrderByHash('0xhash')
+
+            expect(mockHttpConnector.get).toHaveBeenCalledWith(
+                'https://api.test.com/1/order/0xhash',
+                {Authorization: 'Bearer test-auth-key'}
+            )
+            expect(result).toEqual(item)
+        })
+
+        it('should use the default portal base url when omitted', async () => {
+            const portalApi = new Api({
+                networkId: 1,
+                authKey: 'test-auth-key',
+                httpConnector: mockHttpConnector
+            })
+            mockHttpConnector.get.mockResolvedValueOnce({ok: true})
+
+            await portalApi.getOrderByHash('0xabc')
+
+            expect(mockHttpConnector.get).toHaveBeenCalledWith(
+                `${DEV_PORTAL_LIMIT_ORDER_BASE_URL}/1/order/0xabc`,
+                {Authorization: 'Bearer test-auth-key'}
+            )
         })
     })
 })

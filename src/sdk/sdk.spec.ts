@@ -127,4 +127,21 @@ describe('Sdk.createOrder', () => {
         expect(order.feeExtension.fees.integrator.fee.value).toBe(100n)
         expect(order.feeExtension.fees.integrator.share.value).toBe(8000n)
     })
+
+    it('submits the created order', async () => {
+        mockHttpConnector.get.mockResolvedValueOnce(feeInfoWithIntegrator)
+        mockHttpConnector.post.mockResolvedValueOnce(undefined)
+
+        const order = await sdk.createOrder(orderInfo)
+        await sdk.submitOrder(order, '0xsig')
+
+        expect(mockHttpConnector.post).toHaveBeenCalledTimes(1)
+        expect(mockHttpConnector.post.mock.calls[0][0]).toContain('/1/')
+        expect(mockHttpConnector.post.mock.calls[0][1]).toMatchObject({
+            signature: '0xsig',
+            data: expect.objectContaining({
+                maker: maker.toString()
+            })
+        })
+    })
 })
