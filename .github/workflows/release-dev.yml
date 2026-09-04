@@ -55,7 +55,9 @@ jobs:
           git tag v${{ steps.version.outputs.NEW_VERSION }}
           git push
           git push --tags
-          gh release create v${{ steps.version.outputs.NEW_VERSION }}
+          # DEV releases are always rc pre-releases: mark them so they never
+          # become the repo's "latest" release
+          gh release create v${{ steps.version.outputs.NEW_VERSION }} --prerelease
 
       - name: Trigger publish
         env:
