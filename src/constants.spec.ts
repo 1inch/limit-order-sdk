@@ -31,10 +31,16 @@ describe('constants', () => {
                 '0x5281602adc446a94eb48d055f514a6d8d5bee176'
             )
         })
+
+        it('should return non-default LOP v4 for Arc', () => {
+            expect(getLimitOrderContract(5042)).toEqual(
+                '0xe08cab0828a67291ec4af1fb3e7f867e206a6bda'
+            )
+        })
     })
 
     describe('getNativeOrderFactoryContract', () => {
-        it.each([143, 25, 999])(
+        it.each([143, 25, 999, 5042])(
             'should return shared factory deployment for chain %d',
             (chainId) => {
                 expect(getNativeOrderFactoryContract(chainId)).toEqual(
@@ -51,7 +57,7 @@ describe('constants', () => {
     })
 
     describe('getNativeOrderImplContract', () => {
-        it.each([143, 25, 999])(
+        it.each([143, 25, 999, 5042])(
             'should return shared impl deployment for chain %d',
             (chainId) => {
                 expect(getNativeOrderImplContract(chainId)).toEqual(
@@ -83,6 +89,12 @@ describe('constants', () => {
         it('should have WHYPE for HyperEVM', () => {
             expect(LimitOrder.CHAIN_TO_WRAPPER[999]).toEqual(
                 new Address('0x5555555555555555555555555555555555555555')
+            )
+        })
+
+        it('should have WUSDC for Arc', () => {
+            expect(LimitOrder.CHAIN_TO_WRAPPER[5042]).toEqual(
+                new Address('0x1111161b5af064893d1a88e467293ecf660eeeee')
             )
         })
     })

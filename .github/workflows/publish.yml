@@ -78,6 +78,14 @@ jobs:
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
           echo "@1inch:registry=https://npm.pkg.github.com" >> .npmrc
 
+      # Same rc handling as the npm job: prereleases go under the "next"
+      # dist-tag so they never re-point "latest" on GitHub Packages
       - name: Publish 🚀
-        run: pnpm publish --no-git-checks
+        run: |
+          VERSION=$(node -p "require('../package.json').version")
+          if [[ "$VERSION" == *"-rc"* ]]; then
+            pnpm publish --no-git-checks --tag next
+          else
+            pnpm publish --no-git-checks
+          fi
         working-directory: dist
