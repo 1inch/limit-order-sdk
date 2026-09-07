@@ -16,4 +16,24 @@ describe('Extension', () => {
 
         expect(Extension.decode(ext.encode())).toStrictEqual(ext)
     })
+
+    it('should decode empty bytes as default and report empty', () => {
+        const empty = Extension.decode('0x')
+
+        expect(empty).toEqual(Extension.default())
+        expect(empty.isEmpty()).toEqual(true)
+        expect(empty.hasPredicate).toEqual(false)
+        expect(empty.hasMakerPermit).toEqual(false)
+        expect(empty.hasPreInteraction).toEqual(false)
+    })
+
+    it('should reject non-hex field values', () => {
+        expect(
+            () =>
+                new Extension({
+                    ...Extension.EMPTY,
+                    predicate: 'not-hex'
+                })
+        ).toThrow(/predicate must be valid hex string/)
+    })
 })

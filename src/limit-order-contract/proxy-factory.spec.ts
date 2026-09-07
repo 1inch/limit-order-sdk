@@ -29,4 +29,11 @@ describe('ProxyFactory', () => {
             new Address('0xf81af95bb417a82923e5fa001b1e052034026e64')
         )
     })
+
+    it('should use default factory and implementation for a chain', () => {
+        const facade = ProxyFactory.default(1)
+
+        expect(facade.factory.toString()).toMatch(/^0x[0-9a-f]{40}$/)
+        expect(facade.implementation.toString()).toMatch(/^0x[0-9a-f]{40}$/)
+    })
 })
