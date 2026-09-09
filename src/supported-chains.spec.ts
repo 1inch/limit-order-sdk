@@ -23,8 +23,9 @@ describe('supported chains integration', () => {
 
     it('has at least the documented chains registered', () => {
         // Monad (143), Cronos (25) and HyperEVM (999) added in v5.4.2
+        // Arc (5042) added in v5.4.3
         expect(SUPPORTED_CHAIN_IDS).toEqual(
-            expect.arrayContaining([1, 4663, 143, 25, 999])
+            expect.arrayContaining([1, 4663, 143, 25, 999, 5042])
         )
     })
 
