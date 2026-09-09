@@ -65,4 +65,121 @@ describe('LimitOrderWithFee', () => {
             )
         ).toEqual(order)
     })
+
+    it('should compute fill and fee amounts', () => {
+        const taker = Address.fromBigInt(100n)
+        const extension = FeeTakerExtension.new(
+            Address.fromBigInt(1n),
+            Fees.resolverFee(
+                new ResolverFee(Address.fromBigInt(3n), Bps.fromPercent(1))
+            ),
+            [taker]
+        )
+        const order = new LimitOrderWithFee(
+            {
+                makerAsset: new Address(
+                    '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+                ),
+                takerAsset: new Address(
+                    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+                ),
+                makingAmount: 100_000_000n,
+                takingAmount: 100_000_000n,
+                maker: new Address('0x00000000219ab540356cbb839cbe05303d7705fa')
+            },
+            MakerTraits.default(),
+            extension
+        )
+
+        expect(order.getTakingAmount(taker)).toEqual(
+            extension.getTakingAmount(taker, 100_000_000n)
+        )
+        expect(order.getMakingAmount(taker)).toEqual(
+            extension.getMakingAmount(taker, 100_000_000n)
+        )
+        expect(order.getResolverFee(taker)).toEqual(
+            extension.getResolverFee(taker, 100_000_000n)
+        )
+        expect(order.getIntegratorFee(taker)).toEqual(
+            extension.getIntegratorFee(taker, 100_000_000n)
+        )
+        expect(order.getProtocolFee(taker)).toEqual(
+            extension.getProtocolFee(taker, 100_000_000n)
+        )
+    })
+
+    it('should assign a random nonce', () => {
+        const extension = FeeTakerExtension.new(
+            Address.fromBigInt(1n),
+            Fees.resolverFee(
+                new ResolverFee(Address.fromBigInt(3n), Bps.fromPercent(1))
+            ),
+            [Address.fromBigInt(100n)]
+        )
+        const order = LimitOrderWithFee.withRandomNonce(
+            {
+                makerAsset: new Address(
+                    '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+                ),
+                takerAsset: new Address(
+                    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+                ),
+                makingAmount: 1n,
+                takingAmount: 1n,
+                maker: new Address('0x00000000219ab540356cbb839cbe05303d7705fa')
+            },
+            extension
+        )
+
+        expect(order.makerTraits.nonceOrEpoch()).toBeGreaterThanOrEqual(0n)
+
+        const withDefaultTraits = new LimitOrderWithFee(
+            {
+                makerAsset: new Address(
+                    '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+                ),
+                takerAsset: new Address(
+                    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+                ),
+                makingAmount: 1n,
+                takingAmount: 1n,
+                maker: new Address('0x00000000219ab540356cbb839cbe05303d7705fa')
+            },
+            undefined,
+            extension
+        )
+        expect(withDefaultTraits.feeExtension).toEqual(extension)
+    })
+
+    it('should reject fromDataAndExtension when receiver is not the fee taker', () => {
+        const extension = FeeTakerExtension.new(
+            Address.fromBigInt(1n),
+            Fees.resolverFee(
+                new ResolverFee(Address.fromBigInt(3n), Bps.fromPercent(1))
+            )
+        )
+        const order = new LimitOrderWithFee(
+            {
+                makerAsset: new Address(
+                    '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+                ),
+                takerAsset: new Address(
+                    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+                ),
+                makingAmount: 1n,
+                takingAmount: 1n,
+                maker: new Address('0x00000000219ab540356cbb839cbe05303d7705fa')
+            },
+            MakerTraits.default(),
+            extension
+        )
+        const data = {
+            ...order.build(),
+            receiver: Address.fromBigInt(99n).toString()
+        }
+
+        expect(() =>
+            LimitOrderWithFee.fromDataAndExtension(data, order.extension)
+        ).toThrow(/receiver must be FeeTaker extension address/)
+    })
 })
