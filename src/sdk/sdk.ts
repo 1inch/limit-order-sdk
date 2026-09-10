@@ -40,14 +40,15 @@ export class Sdk {
         const integratorFee =
             extra.integratorFee ?? buildIntegratorFeeFromFeeInfo(feeParams)
 
-        const fees = new FeeTakerExt.Fees(
-            new FeeTakerExt.ResolverFee(
-                new Address(feeParams.protocolFeeReceiver),
-                new Bps(BigInt(feeParams.feeBps)),
-                Bps.fromPercent(feeParams.whitelistDiscountPercent)
-            ),
-            integratorFee
-        )
+        const resolverFee = feeParams.feeBps > 0
+            ? new FeeTakerExt.ResolverFee(
+                  new Address(feeParams.protocolFeeReceiver),
+                  new Bps(BigInt(feeParams.feeBps)),
+                  Bps.fromPercent(feeParams.whitelistDiscountPercent)
+              )
+            : FeeTakerExt.ResolverFee.ZERO
+
+        const fees = new FeeTakerExt.Fees(resolverFee, integratorFee)
 
         const feeExt = FeeTakerExt.FeeTakerExtension.new(
             new Address(feeParams.extensionAddress),
