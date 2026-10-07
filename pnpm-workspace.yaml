@@ -1,0 +1,10 @@
+packages:
+  - '.'
+
+# braces@3.0.3 is the latest npm release. GHSA-vfj7-8cjw-p6xm has no patched version.
+# http-cache-semantics@4.3.0 does not fix GHSA-ch52-4w7c-c8xp; the advisory range stops at 4.2.0.
+# pnpm 11 reads this file; the audit step uses pnpm 11.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-vfj7-8cjw-p6xm
+    - GHSA-ch52-4w7c-c8xp
