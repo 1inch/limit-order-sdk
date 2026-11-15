@@ -33,8 +33,8 @@ importers:
   .:
     dependencies:
       '@1inch/byte-utils':
-        specifier: 3.0.0
-        version: 3.0.0(assert@2.1.0)
+        specifier: 3.1.7
+        version: 3.1.7(assert@2.1.0)
       assert:
         specifier: ^2.0.0
         version: 2.1.0
@@ -123,9 +123,9 @@ importers:
 
 packages:
 
-  '@1inch/byte-utils@3.0.0':
-    resolution: {integrity: sha512-CuX4E0z/pzo9hKGzFsMi3vPVgHRRh14ZwNEZ5TY1svnKF8PjxWx3t0CjXCW4dyqKGe6TKAzgYqzzxrMrWPDy5Q==}
-    engines: {node: '>=18.16.0'}
+  '@1inch/byte-utils@3.1.7':
+    resolution: {integrity: sha512-AXS9XWOPXnTYFYozc10fYE3PnplD9RmCzO57U4vzxzGQ0zgdeoTfYe8hXej/NctYJFcTL3PzyC0HZn2sZ7IWbA==}
+    engines: {node: '>=22'}
     peerDependencies:
       assert: ^2.0.0
     peerDependenciesMeta:
@@ -3482,7 +3482,7 @@ packages:
 
 snapshots:
 
-  '@1inch/byte-utils@3.0.0(assert@2.1.0)':
+  '@1inch/byte-utils@3.1.7(assert@2.1.0)':
     optionalDependencies:
       assert: 2.1.0
 
