@@ -111,9 +111,9 @@ export class MakerTraits {
     /**
      * Set order expiration time
      *
-     * @param expiration expiration timestamp in sec
+     * @param expiration expiration timestamp in sec (null or 0n for no expiration)
      */
-    public withExpiration(expiration: bigint): this {
+    public withExpiration(expiration: bigint | null): this {
         const expirationSec = expiration === null ? 0n : expiration
 
         this.value = this.value.setMask(

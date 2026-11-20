@@ -148,11 +148,9 @@ describe('MakerTraits', () => {
         const traits = MakerTraits.default().withExpiration(0n)
 
         expect(traits.expiration()).toEqual(null)
-        expect(
-            MakerTraits.default()
-                .withExpiration(null as unknown as bigint)
-                .expiration()
-        ).toEqual(null)
+        expect(MakerTraits.default().withExpiration(null).expiration()).toEqual(
+            null
+        )
     })
 
     test('partial and multiple fill setters', () => {

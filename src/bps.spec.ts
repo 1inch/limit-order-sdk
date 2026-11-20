@@ -24,6 +24,52 @@ describe('Bps', () => {
         })
     })
 
+    describe('fromFraction', () => {
+        it('should convert fractions without float conversion error', () => {
+            expect(Bps.fromFraction(0.07).value).toBe(700n)
+            expect(Bps.fromFraction(0.28).value).toBe(2800n)
+            expect(Bps.fromFraction(0.57).value).toBe(5700n)
+            expect(Bps.fromFraction(0.8445).value).toBe(8445n)
+        })
+
+        it('should parse fraction from string', () => {
+            expect(Bps.fromFraction('0.07').value).toBe(700n)
+            expect(Bps.fromFraction('0.8445').value).toBe(8445n)
+            expect(Bps.fromFraction('.').value).toBe(0n)
+            expect(Bps.fromFraction('').value).toBe(0n)
+        })
+
+        it('should round down precision greater than 1bps', () => {
+            expect(Bps.fromFraction(0.01234).value).toBe(123n)
+            expect(Bps.fromFraction(0.00005).value).toBe(0n)
+            expect(Bps.fromFraction('0.01239').value).toBe(123n)
+        })
+
+        it('should handle custom base accounting', () => {
+            expect(Bps.fromFraction(25, 100000n).value).toBe(2n)
+            expect(Bps.fromFraction(50, 100n).value).toBe(5000n)
+        })
+
+        it('should handle zero and one', () => {
+            expect(Bps.fromFraction(0).value).toBe(0n)
+            expect(Bps.fromFraction(1).value).toBe(10000n)
+        })
+
+        it('should handle scientific notation without SyntaxError', () => {
+            expect(Bps.fromFraction(1e-5).value).toBe(0n)
+            expect(Bps.fromFraction(1e-7).value).toBe(0n)
+        })
+
+        it('should reject negative fractions', () => {
+            expect(() => Bps.fromFraction(-0.01)).toThrow(/invalid bps/)
+            expect(() => Bps.fromFraction(-0.00005)).toThrow(/invalid bps/)
+        })
+
+        it('should reject fractions greater than 100%', () => {
+            expect(() => Bps.fromFraction(1.0001)).toThrow(/invalid bps/)
+        })
+    })
+
     it('should convert percent and fraction both ways', () => {
         expect(Bps.fromPercent(1).value).toBe(100n)
         expect(Bps.fromFraction(0.01).value).toBe(100n)
