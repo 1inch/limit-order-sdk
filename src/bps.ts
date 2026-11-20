@@ -27,7 +27,13 @@ export class Bps {
      * E.g. 84.45% → 8445 bps
      */
     public static fromSharePercent(val: number | string, base = 1n): Bps {
-        const normalized = typeof val === 'number' ? val.toString() : val.trim()
+        const normalized =
+            typeof val === 'number'
+                ? Number.isFinite(val) &&
+                  (val.toString().includes('e') || val.toString().includes('E'))
+                    ? val.toFixed(12)
+                    : val.toString()
+                : val.trim()
         assert(!normalized.startsWith('-'), `invalid bps ${normalized}`)
 
         const [wholePart = '0', fracPart = ''] = normalized.split('.')
@@ -43,8 +49,21 @@ export class Bps {
      * @param val
      * @param base what represents 100%
      */
-    public static fromFraction(val: number, base = 1n): Bps {
-        return new Bps(BigInt(10000 * val) / base)
+    public static fromFraction(val: number | string, base = 1n): Bps {
+        const normalized =
+            typeof val === 'number'
+                ? Number.isFinite(val) &&
+                  (val.toString().includes('e') || val.toString().includes('E'))
+                    ? val.toFixed(12)
+                    : val.toString()
+                : val.trim()
+        assert(!normalized.startsWith('-'), `invalid bps ${normalized}`)
+
+        const [wholePart = '0', fracPart = ''] = normalized.split('.')
+        const fracBps = (fracPart + '0000').slice(0, 4)
+        const bps = BigInt(wholePart || '0') * 10000n + BigInt(fracBps || '0')
+
+        return new Bps(bps / base)
     }
 
     public equal(other: Bps): boolean {
